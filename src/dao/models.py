@@ -1,7 +1,7 @@
 # coding: utf-8
 from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, String
-from sqlalchemy.dialects.mysql import TINYINT
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -14,7 +14,7 @@ class OsuAsset(Base):
     id = Column(BigInteger, primary_key=True, comment='id')
     source_url = Column(String(500), comment='资源地址')
     oss_url = Column(String(500), comment='oss地址')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuBeatmap(Base):
@@ -23,7 +23,7 @@ class OsuBeatmap(Base):
 
     beatmap_id = Column(BigInteger, primary_key=True, comment='谱面id')
     beatmapset_id = Column(BigInteger, comment='谱面集id')
-    mode = Column(TINYINT, comment='模式')
+    mode = Column(String(10), comment='模式')
     duration = Column(Integer, comment='时长')
     bpm = Column(Float, comment='bpm')
     diff_name = Column(String(255), comment='难度名')
@@ -31,7 +31,7 @@ class OsuBeatmap(Base):
     circle_count = Column(Integer, comment='圆圈数量')
     slider_count = Column(Integer, comment='滑条数量')
     spinner_count = Column(Integer, comment='转盘数量')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuBeatmapDiff(Base):
@@ -51,7 +51,7 @@ class OsuBeatmapDiff(Base):
     acc98 = Column(Float, comment='acc98')
     acc99 = Column(Float, comment='acc99')
     acc100 = Column(Float, comment='acc100')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuBeatmapSet(Base):
@@ -64,7 +64,7 @@ class OsuBeatmapSet(Base):
     artist = Column(String(255), comment='艺术家')
     artist_unicode = Column(String(255), comment='艺术家(unicode)')
     mapper = Column(String(255), comment='谱面作者')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuLog(Base):
@@ -77,7 +77,7 @@ class OsuLog(Base):
     kook_num = Column(Integer, comment='kook数字')
     command = Column(String(255), comment='命令')
     args = Column(String(255), comment='参数')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuStarAsset(Base):
@@ -85,10 +85,10 @@ class OsuStarAsset(Base):
     __table_args__ = {'comment': '难度资源表'}
 
     id = Column(BigInteger, primary_key=True, comment='id')
-    mode = Column(TINYINT, comment='模式')
+    mode = Column(String(10), comment='模式')
     star = Column(Float, comment='难度')
     asset = Column(String(255), comment='资源')
-    create_time = Column(DateTime, comment='创建时间')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuUser(Base):
@@ -98,8 +98,9 @@ class OsuUser(Base):
     id = Column(BigInteger, primary_key=True, comment='id')
     kook_id = Column(BigInteger, comment='kookid')
     osu_id = Column(BigInteger, comment='osuid')
-    default_mode = Column(TINYINT, comment='默认模式')
-    create_time = Column(DateTime, comment='创建时间')
+    osu_name = Column(String(255), comment='osu名称')
+    default_mode = Column(String(10), comment='默认模式')
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
 class OsuUserInfo(Base):
@@ -108,18 +109,17 @@ class OsuUserInfo(Base):
 
     id = Column(BigInteger, primary_key=True, comment='id')
     user_id = Column(BigInteger, comment='用户id')
-    mode = Column(TINYINT, comment='模式')
-    global_rank = Column(Integer, comment='全球排名')
-    county_rank = Column(Integer, comment='国家排名')
-    game_level = Column(Integer, comment='游戏等级')
-    level_progress = Column(Integer, comment='等级进度')
-    pp = Column(Float, comment='pp')
-    accuracy = Column(Float, comment='准确率')
-    play_count = Column(Integer, comment='游玩次数')
-    play_time = Column(Integer, comment='游玩时间')
-    ssh_count = Column(Integer, comment='ssh次数')
-    ss_count = Column(Integer, comment='ss次数')
-    sh_count = Column(Integer, comment='sh次数')
-    s_count = Column(Integer, comment='s次数')
-    a_count = Column(Integer, comment='a次数')
-    create_time = Column(DateTime, comment='创建时间')
+    mode = Column(String(10), comment='模式')
+    global_rank = Column(Integer, comment='全球排名', default=0)
+    game_level = Column(Integer, comment='游戏等级', default=0)
+    level_progress = Column(Integer, comment='等级进度', default=0)
+    pp = Column(Float, comment='pp', default=0)
+    accuracy = Column(Float, comment='准确率', default=0)
+    play_count = Column(Integer, comment='游玩次数', default=0)
+    play_time = Column(Integer, comment='游玩时间', default=0)
+    ssh_count = Column(Integer, comment='ssh次数', default=0)
+    ss_count = Column(Integer, comment='ss次数', default=0)
+    sh_count = Column(Integer, comment='sh次数', default=0)
+    s_count = Column(Integer, comment='s次数', default=0)
+    a_count = Column(Integer, comment='a次数', default=0)
+    create_time = Column(DateTime, comment='创建时间', default=datetime.now())

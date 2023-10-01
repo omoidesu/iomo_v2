@@ -48,18 +48,35 @@ class OsuApi:
         self._redis.set(redis_access_token, self._access_token)
         self._redis.set(redis_refresh_token, self._refresh_token)
 
-    async def get_user(self, user_id: str = None, mode: str = 'osu'):
+    async def get_user(self, user_id: str = None, mode: str = 'osu', use_mode: bool = False):
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
-        url = f'{osu_api}/users/{user_id}/{mode}'
+        if user_id.isdigit() or use_mode:
+            url = f'{osu_api}/users/{user_id}/{mode}'
+        else:
+            url = f'{osu_api}/users/{user_id}'
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取信息失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
+
+    async def get_users(self, *osu_ids):
+        url = f'{osu_api}/users'
+        params = {
+            'ids[]': osu_ids
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(resp.status)
+
+                return await resp.json()
+
 
     async def get_recent_score(self, user_id: str = None, mode: str = 'osu', include_fail: bool = True):
         if user_id is None:

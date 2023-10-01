@@ -1,8 +1,8 @@
 from typing import Type
 
-from src.dao.models import OsuAsset, OsuUser, OsuUserInfo, OsuBeatmap, OsuBeatmapSet, OsuBeatmapDiff, OsuStarAsset
+from src.dao.models import OsuAsset, OsuUser, OsuUserInfo, OsuBeatmap, OsuBeatmapSet, OsuBeatmapDiff, OsuStarAsset, Base
 from src.dao import SqlSession
-from src.util import IdGenerator
+from src.behavior import IdGenerator
 from sqlalchemy.orm.session import Session
 from src.exception import ArgsException
 from src.config import mysql_url
@@ -20,10 +20,17 @@ class __SqlService:
     def new_id(self):
         return self._id_generator.get_id()
 
-    def insert(self, obj):
+    def insert(self, obj: Base):
         if not isinstance(obj, OsuBeatmap) or not isinstance(obj, OsuBeatmapSet):
             obj.id = self.new_id()
         self._session.add(obj)
+        self._session.commit()
+
+    def insert_batch(self, objs: list[Base]):
+        for obj in objs:
+            if not isinstance(obj, OsuBeatmap) or not isinstance(obj, OsuBeatmapSet):
+                obj.id = self.new_id()
+        self._session.add_all(objs)
         self._session.commit()
 
     @staticmethod
@@ -93,7 +100,7 @@ class UserService(__SqlService):
     def __init__(self):
         super().__init__(7)
 
-    def select_user(self, kook_id: int = None, osu_id: int = None) -> Type[OsuUser] | None:
+    def select_user(self, kook_id: int = None, osu_id: int = None, osu_name: str = None) -> Type[OsuUser] | None:
         self.check_args(osu_id, kook_id)
 
         filters = []
@@ -101,6 +108,8 @@ class UserService(__SqlService):
             filters.append(OsuUser.osu_id == osu_id)
         if kook_id is not None:
             filters.append(OsuUser.kook_id == kook_id)
+        if osu_name is not None:
+            filters.append(OsuUser.osu_name == osu_name)
 
         return self._session.query(OsuUser).filter(*filters).first()
 
@@ -127,9 +136,16 @@ class UserInfoService(__SqlService):
     def __init__(self):
         super().__init__(8)
 
-    def select_user_info(self, user_id: int = None, compare_by: int = 1):
+    def select_user_info(self, user_id: int = None, mode: str = 'osu', day: int = 1):
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
-        return self._session.query(OsuUserInfo).filter(OsuUserInfo.user_id == user_id).order_by(
-            OsuUserInfo.create_time.desc()).offset(compare_by - 1).limit(1).first()
+        user_info = self._session.query(OsuUserInfo).filter(OsuUserInfo.user_id == user_id,
+                                                            OsuUserInfo.mode == mode).order_by(
+            OsuUserInfo.create_time.desc()).offset(day).first()
+        if user_info is None:
+            return self._session.query(OsuUserInfo).filter(OsuUserInfo.user_id == user_id,
+                                                           OsuUserInfo.mode == mode).order_by(
+                OsuUserInfo.create_time).first()
+
+        return user_info
