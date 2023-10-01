@@ -66,7 +66,7 @@ class IdGenerator(object):
         # 时钟回拨
         if timestamp < self.last_timestamp:
             logging.error('clock is moving backwards. Rejecting requests until {}'.format(self.last_timestamp))
-            raise
+            raise Exception('时钟回拨')
 
         if timestamp == self.last_timestamp:
             self.sequence = (self.sequence + 1) & SEQUENCE_MASK
