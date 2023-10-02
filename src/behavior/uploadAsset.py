@@ -1,10 +1,14 @@
 import io
+import math
 
 from src.service import asset_service, star_asset_service
 from src.dao.models import OsuAsset, OsuStarAsset
 from khl import Bot
 import aiohttp
 from aiohttp import TCPConnector
+from src.const import Assets
+from PIL import Image
+from src.asset import get_assets
 
 
 async def download_and_upload(bot: Bot, resource: str):
@@ -22,3 +26,57 @@ async def download_and_upload(bot: Bot, resource: str):
                 asset_service.insert(new_asset)
 
                 return kook_url
+
+
+async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float):
+    stars = round(diff, 2)
+
+    asset = star_asset_service.selectStarAssert(mode=mode, star=stars)
+    if asset is not None:
+        return asset.asset
+
+    default = 115
+    if 0 <= stars < 1:
+        xp = 0
+        default = 120
+    elif 1 <= stars < 2:
+        xp = 120
+        default = 120
+    elif 2 <= stars < 3:
+        xp = 240
+    elif 3 <= stars < 4:
+        xp = 355
+    elif 4 <= stars < 5:
+        xp = 470
+    elif 5 <= stars < 6:
+        xp = 585
+    elif 6 <= stars < 7:
+        xp = 700
+    elif 7 <= stars < 8:
+        xp = 815
+    else:
+        return Assets.Image.DIFF.get(mode)
+
+    assets = get_assets()
+    x = (stars - math.floor(stars)) * default + xp
+    color = Image.open(assets.get('color')).load()
+    r, g, b = color[x, 1]
+    # 打开底图
+    im = Image.open(assets.get(mode)).convert('RGBA')
+    xx, yy = im.size
+    # 填充背景
+    sm = Image.new('RGBA', im.size, (r, g, b))
+    sm.paste(im, (0, 0, xx, yy), im)
+    # 把白色变透明
+    for i in range(xx):
+        for z in range(yy):
+            data = sm.getpixel((i, z))
+            if (data.count(255) == 4):
+                sm.putpixel((i, z), (255, 255, 255, 0))
+
+    bytes_io = io.BytesIO()
+    sm.save(bytes_io, format='png')
+    kook_url = await bot.client.create_asset(io.BytesIO(bytes_io.getvalue()))
+
+    star_asset_service.insert(OsuStarAsset(mode=mode, star=stars, asset=kook_url))
+    return kook_url

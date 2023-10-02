@@ -59,11 +59,11 @@ class OsuBeatmapSet(Base):
     __table_args__ = {'comment': '谱面集表'}
 
     beatmapset_id = Column(BigInteger, primary_key=True, comment='谱面集id')
-    music = Column(String(255), comment='谱面名')
-    music_unicode = Column(String(255), comment='谱面名(unicode)')
+    title = Column(String(255), comment='谱面名')
+    title_unicode = Column(String(255), comment='谱面名(unicode)')
     artist = Column(String(255), comment='艺术家')
     artist_unicode = Column(String(255), comment='艺术家(unicode)')
-    mapper = Column(String(255), comment='谱面作者')
+    creator = Column(String(255), comment='谱面作者')
     create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 
 
@@ -86,7 +86,7 @@ class OsuStarAsset(Base):
 
     id = Column(BigInteger, primary_key=True, comment='id')
     mode = Column(String(10), comment='模式')
-    star = Column(Float, comment='难度')
+    star = Column(String(5), comment='难度')
     asset = Column(String(255), comment='资源')
     create_time = Column(DateTime, comment='创建时间', default=datetime.now())
 

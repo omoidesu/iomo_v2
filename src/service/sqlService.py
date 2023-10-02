@@ -1,5 +1,7 @@
 from typing import Type
 
+from sqlalchemy.exc import IntegrityError
+
 from src.dao.models import OsuAsset, OsuUser, OsuUserInfo, OsuBeatmap, OsuBeatmapSet, OsuBeatmapDiff, OsuStarAsset, Base
 from src.dao import SqlSession
 from src.behavior import IdGenerator
@@ -24,7 +26,10 @@ class __SqlService:
         if not isinstance(obj, OsuBeatmap) or not isinstance(obj, OsuBeatmapSet):
             obj.id = self.new_id()
         self._session.add(obj)
-        self._session.commit()
+        try:
+            self._session.commit()
+        except IntegrityError:
+            self._session.rollback()
 
     def insert_batch(self, objs: list[Base]):
         for obj in objs:
@@ -86,7 +91,7 @@ class StarAssertService(__SqlService):
     def __init__(self):
         super().__init__(6)
 
-    def selectStarAssert(self, mode: int = None, star: float = None):
+    def selectStarAssert(self, mode: str = None, star: float = None):
         if mode is None or star is None:
             raise ArgsException('mode和star不能为空')
 

@@ -18,8 +18,8 @@ class OsuApi:
 
     def __init__(self):
         self._redis = Redis.instance().get_connection()
-        self._access_token = self._redis.get(redis_access_token)
-        self._refresh_token = self._redis.get(redis_refresh_token)
+        self._access_token = str(self._redis.get(redis_access_token))[2:-1]
+        self._refresh_token = str(self._redis.get(redis_refresh_token))[2:-1]
 
         if self._access_token is None:
             self.refresh_token()
@@ -77,21 +77,23 @@ class OsuApi:
 
                 return await resp.json()
 
-
-    async def get_recent_score(self, user_id: str = None, mode: str = 'osu', include_fail: bool = True):
+    async def get_recent_score(self, user_id: str = None, mode: str = 'osu', limit: int = 5,
+                               include_fail: bool = True, use_mode: bool = False):
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
         url = f'{osu_api}/users/{user_id}/scores/recent'
         params = {
             'include_fails': 1 if include_fail else 0,
-            'mode': mode
+            'limit': limit
         }
+        if use_mode:
+            params['mode'] = mode
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取最近成绩失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 

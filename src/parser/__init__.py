@@ -6,6 +6,7 @@ from src.card import user_card
 from src.behavior.uploadAsset import download_and_upload
 from src.behavior.log import save_log
 from .infoParser import info_parser
+from .recentParser import recent_parser
 
 
 def ping_parser(msg: Message, *args):

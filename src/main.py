@@ -6,7 +6,8 @@ from src.parser import (
     ping_parser,
     bind_parser,
     unbind_parser,
-    info_parser
+    info_parser,
+    recent_parser
 )
 
 bot = Bot(token=bot_token)
@@ -35,4 +36,10 @@ async def unbind(msg: Message, *args):
 @bot.command(name='info', prefixes=['.'])
 async def info(msg: Message, *args):
     reply = await info_parser(bot, msg, *args)
+    await msg.reply(reply)
+
+
+@bot.command(name='recent', aliases=['r'], prefixes=['.'])
+async def recent(msg: Message, *args):
+    reply = await recent_parser(bot, msg, *args, include_fail=True)
     await msg.reply(reply)

@@ -1,9 +1,8 @@
 from src.behavior.log import save_log
 from src.service import user_service
-from khl import Message
+from khl import Bot, Message
 from src.const import game_mode_convent
 from src.behavior.command import info_behavior
-from khl import Bot
 
 
 async def info_parser(bot: Bot, msg: Message, *args):
