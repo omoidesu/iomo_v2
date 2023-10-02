@@ -1,7 +1,7 @@
-from .sqlService import AssetService, BeatmapService, BeatmapSetService, BeatmapDiffService, LogService, \
-    StarAssertService, UserService, UserInfoService
 from .api import OsuApi, SayoApi
-from .osuWeb import search, get_mp_event
+from .osuWeb import get_mp_event, search
+from .sqlService import AssetService, BeatmapDiffService, BeatmapService, BeatmapSetService, LogService, \
+    StarAssertService, UserInfoService, UserService
 
 asset_service = AssetService()
 beatmap_service = BeatmapService()

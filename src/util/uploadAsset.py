@@ -1,14 +1,15 @@
 import io
 import math
 
-from src.service import asset_service, star_asset_service
-from src.dao.models import OsuAsset, OsuStarAsset
-from khl import Bot
 import aiohttp
-from aiohttp import TCPConnector
-from src.const import Assets
 from PIL import Image
+from aiohttp import TCPConnector
+from khl import Bot
+
 from src.asset import get_assets
+from src.const import Assets
+from src.dao.models import OsuAsset, OsuStarAsset
+from src.service import asset_service, star_asset_service
 
 
 async def download_and_upload(bot: Bot, resource: str):

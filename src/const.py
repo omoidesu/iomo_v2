@@ -192,3 +192,36 @@ class Sticker:
         'wip': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
         'graveyard': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]'
     }
+
+    STATISTICS = {
+        'osu': {
+            'count_300': '(emj)osu_300(emj)[8462491027363735/RFCyQ9F2Br05q03c]',
+            'count_100': '(emj)osu_100(emj)[8462491027363735/lNVVxabQ5r05e036]',
+            'count_50': '(emj)osu_50(emj)[8462491027363735/Kf1273LpyI03y036]',
+            'count_miss': '(emj)osu_miss(emj)[8462491027363735/fs3hty0W2b03m03m]',
+            'count_geki': '(emj)osu_geki(emj)[8462491027363735/CVsCY4rjcp04i04k]',
+            'count_katu': '(emj)osu_katu(emj)[8462491027363735/diU6rW35Yl03e03g]'
+        },
+
+        'taiko': {
+            'count_300': '(emj)taiko_300(emj)[8462491027363735/fNZwGrjeo70ao0ao]',
+            'count_100': '(emj)taiko_100(emj)[8462491027363735/gE40WXpzib0ao0ao]',
+            'count_miss': '(emj)taiko_miss(emj)[8462491027363735/pwAOUL8tA608w08w]',
+        },
+
+        'fruits': {
+            'count_300': '(emj)fruits_300(emj)[8462491027363735/uo3Lc0029602v02w]',
+            'count_100': '(emj)fruits_100(emj)[8462491027363735/LMrnKuBHHh02602t]',
+            'count_katu': '(emj)fruits_katu(emj)[8462491027363735/yDSk3XFqua01o01z]',
+            'count_miss': '(emj)fruits_miss(emj)[8462491027363735/vz739p9XHy02c02b]'
+        },
+
+        'mania': {
+            'count_geki': '(emj)mania_geki(emj)[8462491027363735/xg8OLGrR7u0ag052]',
+            'count_300': '(emj)mania_300(emj)[8462491027363735/8FP93o7iQC0ck07a]',
+            'count_katu': '(emj)mania_katu(emj)[8462491027363735/YGE81JV82K0bi06o]',
+            'count_100': '(emj)mania_100(emj)[8462491027363735/WAN7y7AwWk0a406g]',
+            'count_50': '(emj)mania_50(emj)[8462491027363735/OLG23veds207w06a]',
+            'count_miss': '(emj)mania_miss(emj)[8462491027363735/KPYhAwmthM0a205i]',
+        }
+    }

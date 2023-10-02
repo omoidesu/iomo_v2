@@ -1,8 +1,9 @@
-from src.behavior.log import save_log
-from src.service import user_service
 from khl import Bot, Message
+
+from src.command import info_command
 from src.const import game_mode_convent
-from src.behavior.command import info_behavior
+from src.service import user_service
+from src.util.log import save_log
 
 
 async def info_parser(bot: Bot, msg: Message, *args):
@@ -77,4 +78,4 @@ async def info_parser(bot: Bot, msg: Message, *args):
 
     day = 1 if day == 0 else day
     # 调用osu api并生成卡片
-    return await info_behavior(bot, str(osu_name), mode, int(day), user_id)
+    return await info_command(bot, str(osu_name), mode, int(day), user_id)

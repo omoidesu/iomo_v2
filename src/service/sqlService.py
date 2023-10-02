@@ -1,14 +1,14 @@
 from typing import Type
 
-from sqlalchemy.exc import IntegrityError
-
-from src.dao.models import OsuAsset, OsuUser, OsuUserInfo, OsuBeatmap, OsuBeatmapSet, OsuBeatmapDiff, OsuStarAsset, Base
-from src.dao import SqlSession
-from src.behavior import IdGenerator
-from sqlalchemy.orm.session import Session
-from src.exception import ArgsException
-from src.config import mysql_url
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.session import Session
+
+from src.config import mysql_url
+from src.dao import SqlSession
+from src.dao.models import Base, OsuAsset, OsuBeatmap, OsuBeatmapDiff, OsuBeatmapSet, OsuStarAsset, OsuUser, OsuUserInfo
+from src.exception import ArgsException
+from src.util import IdGenerator
 
 
 class __SqlService:

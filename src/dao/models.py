@@ -1,7 +1,8 @@
 # coding: utf-8
+from datetime import datetime
+
 from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
 
 Base = declarative_base()
 metadata = Base.metadata

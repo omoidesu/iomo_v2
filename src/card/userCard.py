@@ -1,10 +1,11 @@
-from khl.card import Card, CardMessage, Module, Element, Types
-from src.dao.models import OsuUserInfo
-from src.const import Assets
-from src.behavior import time_format, count_delta
 from datetime import datetime
 
-divider = Module.Divider()
+from khl.card import Card, CardMessage, Element, Module, Types
+
+from src.const import Assets
+from src.dao.models import OsuUserInfo
+from src.util import count_delta, time_format
+from ._modules import Modules
 
 
 def user_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
@@ -45,9 +46,9 @@ def user_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
         Element.Text(' | '.join(context), Types.Text.KMD)
     ))
 
-    card.append(divider)
-    card.append(Module.Container(Element.Image(kwargs.get('cover', Assets.Image.DEFAULT_COVER))))
-    card.append(divider)
+    card.append(Modules.divider)
+    card.append(Modules.banner(kwargs.get('cover', Assets.Image.DEFAULT_COVER)))
+    card.append(Modules.divider)
 
     country_rank = user_info.get("statistics", {"country_rank": 0}).get("country_rank")
     pp = user_info.get('statistics', {'pp': 0}).get('pp')
@@ -67,7 +68,7 @@ def user_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
         accessory=Element.Image(user_info.get('avatar_url'), size=Types.Size.SM),
         mode=Types.SectionMode.RIGHT
     ))
-    card.append(divider)
+    card.append(Modules.divider)
 
     ssh = user_info.get('statistics', {'grade_counts': {'ssh': 0}}).get('grade_counts').get('ssh')
     ss = user_info.get('statistics', {'grade_counts': {'ss': 0}}).get('grade_counts').get('ss')

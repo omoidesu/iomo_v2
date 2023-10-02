@@ -1,6 +1,11 @@
-from src.service import user_info_service, OsuApi
-from src.dao.models import OsuUserInfo
+from khl import Bot, Message
+
 from src.const import game_modes
+from src.dao import Redis
+from src.dao.models import OsuUserInfo
+from src.dto import RecentListCacheDTO
+from src.service import OsuApi, user_info_service
+from .messageUtil import construct_message_obj
 
 
 async def collect_user_info(**kwargs):
@@ -37,3 +42,16 @@ async def collect_user_info(**kwargs):
                 ))
 
     user_info_service.insert_batch(data_list)
+
+
+def cache_map_to_redis(msg_id: str, dto: RecentListCacheDTO):
+    redis = Redis.instance().get_connection()
+
+    redis.set(msg_id, dto.to_json_str())
+
+
+async def add_reaction(bot: Bot, msg_id: str, raw_msg: Message, user_id: str, dto: RecentListCacheDTO):
+    msg = construct_message_obj(bot, msg_id, raw_msg.ctx.channel.id, raw_msg.ctx.channel.id, user_id)
+
+    for emoji in dto.id_map.keys():
+        await msg.add_reaction(emoji)

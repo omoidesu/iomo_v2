@@ -1,9 +1,9 @@
-from khl.card import Card, CardMessage, Module, Element, Types
-from src.const import Assets, Sticker
+from khl.card import Card, CardMessage, Element, Module, Types
 
-nums = [':one:', ':two:', ':three:', ':four:', ':five:', ':six:', ':seven:', ':eight:', ':nine:', ':keycap_ten:']
+from src.const import Assets
+from ._modules import Modules
 
-divider = Module.Divider()
+nums = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣')
 
 
 def recent_card(recent_score: list, **kwargs):
@@ -15,9 +15,12 @@ def recent_card(recent_score: list, **kwargs):
 
     header = f'{name} 的最近游玩记录'
     card.append(Module.Header(header))
-    card.append(divider)
+    card.append(Modules.divider)
+
+    id_map = {}
 
     for score in recent_score:
+        id_map[nums[recent_score.index(score)]] = score.get('id')
         beatmapset = score.get('beatmapset')
         artist = beatmapset.get('artist_unicode').replace('*', '\\*')
         title = beatmapset.get('title_unicode').replace('*', '\\*')
@@ -35,17 +38,17 @@ def recent_card(recent_score: list, **kwargs):
             f' **[{artist} - {title}](https://osu.ppy.sh/beatmapsets/{beatmapset.get("id")})**', type=Types.Text.KMD
         ))
 
-        for mod in score.get('mods', []):
-            context.append(Element.Image(Assets.Image.MOD.get(mod)))
-
         context.append('\n' + ' ' * 7)
         context.append(Element.Image(Assets.Image.RANK.get(score.get('rank'))))
         context.append(
             Element.Image(stars.get(difficulty_rating, Assets.Image.DIFF.get(mode))))
-        context.append(Element.Text(f'**{difficulty_rating_str} ★**  |  **pp: {pp}**'))
+        context.append(Element.Text(f'**{difficulty_rating_str} ★**  |  **pp: {round(pp)}**'))
+
+        for mod in score.get('mods', []):
+            context.append(Element.Image(Assets.Image.MOD.get(mod)))
 
         card.append(context)
         if recent_score.index(score) != len(recent_score) - 1:
-            card.append(divider)
+            card.append(Modules.divider)
 
-    return CardMessage(card)
+    return CardMessage(card), id_map

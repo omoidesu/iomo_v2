@@ -1,12 +1,13 @@
-from aiohttp import TCPConnector
-
-from src.const import redis_access_token, redis_refresh_token, osu_api, sayo_api
-from src.dao import Redis
-from src.exception import ArgsException, OsuApiException
-from src.config import client_id, client_secret
+import json
 
 import aiohttp
 import requests
+from aiohttp import TCPConnector
+
+from src.config import client_id, client_secret
+from src.const import osu_api, redis_access_token, redis_refresh_token, sayo_api
+from src.dao import Redis
+from src.exception import ArgsException, OsuApiException
 
 
 class OsuApi:
@@ -18,8 +19,10 @@ class OsuApi:
 
     def __init__(self):
         self._redis = Redis.instance().get_connection()
-        self._access_token = str(self._redis.get(redis_access_token))[2:-1]
-        self._refresh_token = str(self._redis.get(redis_refresh_token))[2:-1]
+        access_token_byte = self._redis.get(redis_access_token)
+        self._access_token = access_token_byte.decode('utf-8')
+        refresh_token_byte = self._redis.get(redis_refresh_token)
+        self._refresh_token = refresh_token_byte.decode('utf-8') if refresh_token_byte is not None else None
 
         if self._access_token is None:
             self.refresh_token()
@@ -77,7 +80,7 @@ class OsuApi:
 
                 return await resp.json()
 
-    async def get_recent_score(self, user_id: str = None, mode: str = 'osu', limit: int = 5,
+    async def get_recent_score(self, user_id: int = None, mode: str = 'osu', limit: int = 5,
                                include_fail: bool = True, use_mode: bool = False):
         if user_id is None:
             raise ArgsException('user_id不能为空')
@@ -152,7 +155,8 @@ class OsuApi:
 
 
 class SayoApi:
-    async def search(self, keyword: str, mode: int, beatmap_status: int):
+    @staticmethod
+    async def search(keyword: str, mode: int, beatmap_status: int):
         url = f'{sayo_api}/?post'
         data = {
             'class': beatmap_status,
@@ -169,10 +173,12 @@ class SayoApi:
 
                 return await resp.json()
 
-    async def get_beatmap_info(self, keyword: str):
+    @staticmethod
+    async def get_beatmap_info(keyword: str, id_mode: bool = False):
         url = f'{sayo_api}/v2/beatmapinfo'
         params = {
-            'K': keyword
+            'K': keyword,
+            'T': 1 if id_mode else 0,
         }
 
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
@@ -180,4 +186,4 @@ class SayoApi:
                 if resp.status != 200:
                     raise OsuApiException(f'获取谱面信息失败 code: {resp.status}')
 
-                return await resp.json()
+                return json.loads(await resp.text())

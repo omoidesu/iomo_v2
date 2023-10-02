@@ -1,5 +1,5 @@
-import time
 import logging
+import time
 
 # 64位ID的划分
 WORKER_ID_BITS = 5

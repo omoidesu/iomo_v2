@@ -1,6 +1,9 @@
-from .idGenerator import IdGenerator
-from src.exception import ArgsException
+from datetime import datetime, timedelta
+
 from src.const import mods
+from src.exception import ArgsException
+from .idGenerator import IdGenerator
+from .messageUtil import *
 
 
 def time_format(secs: int):
@@ -84,3 +87,18 @@ def mods_parser(mod: str) -> list[str]:
             hd_conflict[arg_mod] = True
 
     return arg_mods
+
+
+def seconds_to_str(secs: int):
+    _min, _sec = divmod(secs, 60)
+    hour, _min = divmod(_min, 60)
+
+    sec_str = str(_sec) if _sec > 9 else '0' + str(_sec)
+    min_str = str(_min) if _min > 9 else '0' + str(_min)
+
+    return f'{hour}:{min_str}:{sec_str}' if hour > 0 else f'{_min}:{sec_str}'
+
+
+def convert_date(date: str) -> str:
+    iso_date = datetime.fromisoformat(date.replace('Z', '+00:00'))
+    return (iso_date + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')

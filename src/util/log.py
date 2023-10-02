@@ -1,6 +1,7 @@
 from khl import Message
-from src.service import log_service
+
 from src.dao.models import OsuLog
+from src.service import log_service
 
 
 def save_log(msg: Message, *args):

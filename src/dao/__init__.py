@@ -1,10 +1,9 @@
 import redis
-
-from src.config import redis_host, redis_port, redis_pass, redis_db
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+
+from src.config import redis_db, redis_host, redis_pass, redis_port
 
 
 class SqlSession:

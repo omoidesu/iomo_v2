@@ -1,11 +1,12 @@
 from khl import Bot, Message
 
+from src.command import recent_command
 from src.const import game_mode_convent
-from src.behavior.log import save_log
+from src.dao.models import OsuUser
 from src.exception import ArgsException
-from src.behavior import mods_parser
 from src.service import user_service
-from src.behavior.command import recent_behavior
+from src.util import mods_parser
+from src.util.log import save_log
 
 
 async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
@@ -28,7 +29,7 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
         if mode == '' and arg.startswith(':'):
             mode = arg[1:]
             if mode not in game_mode_convent.keys():
-                return 'mode参数错误'
+                return 'mode参数错误', None
             mode = game_mode_convent.get(mode)
             index['mode'] = arg_index
             continue
@@ -40,14 +41,14 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
                 index['mod'] = arg_index
                 continue
             except ArgsException as e:
-                return e.message
+                return e.message, None
         if not order and arg.startswith('#'):
             order = arg[1:]
             if not order.isdigit():
-                return 'order参数必须为数字'
+                return 'order参数必须为数字', None
             if int(order) <= 0:
-                return 'order参数不能为负数'
-            order = int(order) - 1
+                return 'order参数必须为正整数', None
+            order = int(order)
             index['order'] = arg_index
 
     # 如果变量位置都是初始值则所有元素都是用户名
@@ -66,12 +67,12 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
 
     # 如果target_kook_id不是初始值则查询target_kook_id绑定的osu信息
     if target_kook_id:
-        user = user_service.select_user(target_kook_id)
+        user: OsuUser = user_service.select_user(target_kook_id)
         if user is None:
-            return '该用户还没有绑定osu账号'
+            return '该用户还没有绑定osu账号', None
 
         osu_name = user.osu_id
         if mode == '':
             mode = user.default_mode
 
-    return await recent_behavior(bot, msg, osu_name, mode, mod, order, include_fail, ls_mode)
+    return await recent_command(bot, msg, osu_name, mode, mod, order, include_fail, ls_mode)
