@@ -17,6 +17,22 @@ class OsuApi:
 
     _redis = None
 
+    """
+    routers:
+        /users/{user}/{mode?} 获取用户信息
+        /users 获取多个用户信息
+        /users/{user}/scores/recent 获取最近游玩记录
+        /users/{user}/scores/best 获取bp
+        /beatmaps/{beatmap_id}/scores/users/{user} 获取指定谱面成绩
+        /beatmaps/{beatmap_id}/scores 获取谱面top成绩
+        /beatmaps/{beatmap_id} 获取谱面信息
+        /beatmapsets/{beatmapset_id} 获取谱面集信息
+        /beatmapsets/search 搜索谱面集
+        /matches 获取mp房间列表
+        /matches/{match_id} 获取mp游戏信息
+        /rankings/{mode}/{type} 获取排行榜
+    """
+
     def __init__(self):
         self._redis = Redis.instance().get_connection()
         access_token_byte = self._redis.get(redis_access_token)
@@ -32,6 +48,7 @@ class OsuApi:
         }
 
     def refresh_token(self):
+        """刷新token"""
         url = 'osu.ppy.sh/oauth/token'
         data = {
             'grant_type': 'refresh_token',
@@ -52,6 +69,7 @@ class OsuApi:
         self._redis.set(redis_refresh_token, self._refresh_token)
 
     async def get_user(self, user_id: str = None, mode: str = 'osu', use_mode: bool = False):
+        """获取用户"""
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
@@ -68,6 +86,7 @@ class OsuApi:
                 return await resp.json()
 
     async def get_users(self, *osu_ids):
+        """获取多个用户"""
         url = f'{osu_api}/users'
         params = {
             'ids[]': osu_ids
@@ -82,6 +101,7 @@ class OsuApi:
 
     async def get_recent_score(self, user_id: int = None, mode: str = 'osu', limit: int = 5,
                                include_fail: bool = True, use_mode: bool = False):
+        """获取最近游玩记录"""
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
@@ -101,6 +121,7 @@ class OsuApi:
                 return await resp.json()
 
     async def get_best_score(self, user_id: str = None, mode: str = 'osu', limit: int = 10):
+        """获取bp"""
         if user_id is None:
             raise ArgsException('user_id不能为空')
 
@@ -118,6 +139,7 @@ class OsuApi:
                 return await resp.json()
 
     async def get_beatmap_score(self, beatmap_id: int, user_id: int, mode: str = 'osu'):
+        """获取指定谱面成绩"""
         url = f'{osu_api}/beatmaps/{beatmap_id}/scores/users/{user_id}'
         params = {
             'mode': mode
@@ -131,6 +153,7 @@ class OsuApi:
                 return await resp.json()
 
     async def get_beatmap_top_score(self, beatmap_id: int, mode: str = 'osu'):
+        """获取谱面top成绩"""
         url = f'{osu_api}/beatmaps/{beatmap_id}/scores'
         params = {
             'mode': mode
@@ -144,6 +167,7 @@ class OsuApi:
                 return await resp.json()
 
     async def get_beatmap_info(self, beatmap_id: int):
+        """获取谱面信息"""
         url = f'{osu_api}/beatmaps/{beatmap_id}'
 
         async with aiohttp.ClientSession() as session:
@@ -153,11 +177,99 @@ class OsuApi:
 
                 return await resp.json()
 
+    async def get_beatmapset_info(self, beatmapset_id: int):
+        """获取谱面集信息"""
+        url = f'{osu_api}/beatmapsets/{beatmapset_id}'
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'获取谱面集信息失败 code: {resp.status}')
+
+                return await resp.json()
+
+    async def search_beatmapset(self, keyword: str, mode: str, cursor_string: str, include_unrank: bool = False):
+        """搜索谱面集"""
+        modes = {'osu': 0, 'taiko': 1, 'fruits': 2, 'mania': 3}
+
+        url = f'{osu_api}/beatmapsets/search'
+        params = {
+            'q': keyword,
+            'cursor_string': cursor_string
+        }
+
+        if mode is not None:
+            params['m'] = modes.get(mode)
+
+        if include_unrank:
+            params['s'] = 'any'
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'搜索谱面集失败 code: {resp.status}')
+
+                return await resp.json()
+
+    async def get_match_list(self, cursor_string: str):
+        """获取mp房间列表"""
+        url = f'{osu_api}/matches'
+        params = {
+            'cursor_string': cursor_string
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'获取mp房间列表失败 code: {resp.status}')
+
+                return await resp.json()
+
+    async def get_match_event(self, match_id: int, after: int = None, limit: int = 10):
+        """获取mp游戏信息"""
+        url = f'{osu_api}/matches/{match_id}'
+        params = {
+            'after': after,
+            'limit': limit
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'获取mp游戏信息失败 code: {resp.status}')
+
+                return await resp.json()
+
+    async def get_global_ranking(self, mode: str, country: str = None):
+        """获取全球排行榜"""
+        url = f'{osu_api}/rankings/{mode}/performance'
+        params = {
+            'country': country
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=self._header) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'获取全球排行榜失败 code: {resp.status}')
+
+                return await resp.json()
+
 
 class SayoApi:
     @staticmethod
     async def search(keyword: str, mode: int, beatmap_status: int):
+        """
+            sayo api搜索谱面
+            文档：https://www.showdoc.com.cn/SoulDee/3969517351482508
+        """
         url = f'{sayo_api}/?post'
+
+        if mode is None:
+            mode = 15
+
+        if beatmap_status is None:
+            beatmap_status = 7
+
         data = {
             'class': beatmap_status,
             'cmd': 'beatmaplist',
@@ -187,3 +299,7 @@ class SayoApi:
                     raise OsuApiException(f'获取谱面信息失败 code: {resp.status}')
 
                 return json.loads(await resp.text())
+
+
+class Chimu:
+    ...
