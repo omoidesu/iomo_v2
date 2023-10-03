@@ -1,5 +1,4 @@
 from .api import OsuApi, SayoApi
-from .osuWeb import get_mp_event, search
 from .sqlService import AssetService, BeatmapDiffService, BeatmapService, BeatmapSetService, LogService, \
     StarAssertService, UserInfoService, UserService
 

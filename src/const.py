@@ -128,100 +128,99 @@ class Assets:
             'mania': 'https://img.kaiheila.cn/assets/2021-08/ZpbkNfUxqo0dw0dw.png'
         }
 
+    class Sticker:
+        class Misc:
+            BPM = '(emj)bpm(emj)[6147923945822473/IuRZ4sJGs80fn0fn]'
+            CIRCLES = '(emj)circles(emj)[6147923945822473/Fg1qywTKmC0fn0fn]'
+            SLIDERS = '(emj)sliders(emj)[6147923945822473/qJeiQMdBQk0fn0fn]'
+            LENGTH = '(emj)length(emj)[6147923945822473/VPfMmUrAP90fn0fn]'
+            PROFILE = '(emj)profile(emj)[6147923945822473/UT3YVPbPI002s02s]'
+            PLAY = '(emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]'
+            FAVOURATE = '(emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]'
 
-class Sticker:
-    class Misc:
-        BPM = '(emj)bpm(emj)[6147923945822473/IuRZ4sJGs80fn0fn]'
-        CIRCLES = '(emj)circles(emj)[6147923945822473/Fg1qywTKmC0fn0fn]'
-        SLIDERS = '(emj)sliders(emj)[6147923945822473/qJeiQMdBQk0fn0fn]'
-        LENGTH = '(emj)length(emj)[6147923945822473/VPfMmUrAP90fn0fn]'
-        PROFILE = '(emj)profile(emj)[6147923945822473/UT3YVPbPI002s02s]'
-        PLAY = '(emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]'
-        FAVOURATE = '(emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]'
-
-    MODS = {
-        'EZ': '(emj)modEZ(emj)[6147923945822473/BNm1HKXTk301900w]',
-        'NF': '(emj)modNF(emj)[6147923945822473/liWefVzool01900w]',
-        'HT': '(emj)modHT(emj)[6147923945822473/oVrgtIv5BW01900w]',
-        'HR': '(emj)modHR(emj)[6147923945822473/oB4q89gfRE01900w]',
-        'SD': '(emj)modSD(emj)[6147923945822473/K4xZkmHBOm01900w]',
-        'DT': '(emj)modDT(emj)[6147923945822473/uvBekQGLHX01900w]',
-        'NC': '(emj)modNC(emj)[6147923945822473/SymPZhKRlb01900w]',
-        'HD': '(emj)modHD(emj)[6147923945822473/cysdyeOJId01900w]',
-        'FL': '(emj)modFL(emj)[6147923945822473/GYm7PCDgou01900w]',
-        'RX': '(emj)modRX(emj)[6147923945822473/aSRnt2vWQg01900w]',
-        'AP': '(emj)modAP(emj)[6147923945822473/OUA0zUyX2b01900w]',
-        'SO': '(emj)modSO(emj)[6147923945822473/TNVTcHV0V501900w]',
-        'TD': '(emj)modTD(emj)[6147923945822473/Saao0maPAY01800u]',
-        'FI': '(emj)modFI(emj)[6147923945822473/E0VrPzEsuX01900w]',
-        '4K': '(emj)mod4K(emj)[6147923945822473/Askp34kfZP01900w]',
-        '5K': '(emj)mod5K(emj)[6147923945822473/5PA4gUK4mB01900w]',
-        '6K': '(emj)mod6K(emj)[6147923945822473/S2U1YjFAmu01900w]',
-        '7K': '(emj)mod7K(emj)[6147923945822473/RGNf6tKsi701900w]',
-        '8K': '(emj)mod8K(emj)[6147923945822473/OouSGtpccB01900w]',
-        '9K': '(emj)mod9K(emj)[6147923945822473/gq2Ex1yTaU01900w]',
-        'MR': '(emj)modMR(emj)[6147923945822473/sztiOBFLwX01900w]',
-        'NM': '(emj)modNM(emj)[6147923945822473/PdcDWD2Tsg01900w]'
-    }
-
-    RANKS = {
-        'A': '(emj)rankA(emj)[6147923945822473/3t1aVcRJLk03g01q]',
-        'B': '(emj)rankB(emj)[6147923945822473/lu1xQGVxHc03g01q]',
-        'C': '(emj)rankC(emj)[6147923945822473/QRj5ZPzUM203g01q]',
-        'D': '(emj)rankD(emj)[6147923945822473/qksOqZNjle03g01q]',
-        'F': '(emj)rankF(emj)[6147923945822473/HkOLe5XdJN03g01q]',
-        'S': '(emj)rankS(emj)[6147923945822473/Pg9N2rp2rg03g01q]',
-        'SH': '(emj)rankSH(emj)[6147923945822473/nBEToRSz4w03f01q]',
-        'X': '(emj)rankX(emj)[6147923945822473/Xj41eVcF2003g01q]',
-        'XH': '(emj)rankXH(emj)[6147923945822473/TQnmo93NY003g01q]'
-    }
-
-    MODES = {
-        0: '(emj)modeOSU(emj)[6147923945822473/adAvlRGhPU0rs0rs]',
-        1: '(emj)modeTaiko(emj)[6147923945822473/uC0ixh9gwg0rs0rs]',
-        2: '(emj)modeFruits(emj)[6147923945822473/eT3zJk3Dmi0rs0rs]',
-        3: '(emj)modeMania(emj)[6147923945822473/NlwJP3fylJ0rs0rs]'
-    }
-
-    STATUS = {
-        'ranked': '(emj)ranked(emj)[6147923945822473/XRH8X7Jzq201s01s]',
-        'approved': '(emj)approved(emj)[6147923945822473/XviIgvKOaG01s01s]',
-        'qualified': '(emj)qualified(emj)[6147923945822473/G5cBjKEYut01s01s]',
-        'loved': '(emj)loved(emj)[6147923945822473/76HKRBtX5Z01s01s]',
-        'pending': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
-        'wip': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
-        'graveyard': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]'
-    }
-
-    STATISTICS = {
-        'osu': {
-            'count_300': '(emj)osu_300(emj)[8462491027363735/RFCyQ9F2Br05q03c]',
-            'count_100': '(emj)osu_100(emj)[8462491027363735/lNVVxabQ5r05e036]',
-            'count_50': '(emj)osu_50(emj)[8462491027363735/Kf1273LpyI03y036]',
-            'count_miss': '(emj)osu_miss(emj)[8462491027363735/fs3hty0W2b03m03m]',
-            'count_geki': '(emj)osu_geki(emj)[8462491027363735/CVsCY4rjcp04i04k]',
-            'count_katu': '(emj)osu_katu(emj)[8462491027363735/diU6rW35Yl03e03g]'
-        },
-
-        'taiko': {
-            'count_300': '(emj)taiko_300(emj)[8462491027363735/fNZwGrjeo70ao0ao]',
-            'count_100': '(emj)taiko_100(emj)[8462491027363735/gE40WXpzib0ao0ao]',
-            'count_miss': '(emj)taiko_miss(emj)[8462491027363735/pwAOUL8tA608w08w]',
-        },
-
-        'fruits': {
-            'count_300': '(emj)fruits_300(emj)[8462491027363735/uo3Lc0029602v02w]',
-            'count_100': '(emj)fruits_100(emj)[8462491027363735/LMrnKuBHHh02602t]',
-            'count_katu': '(emj)fruits_katu(emj)[8462491027363735/yDSk3XFqua01o01z]',
-            'count_miss': '(emj)fruits_miss(emj)[8462491027363735/vz739p9XHy02c02b]'
-        },
-
-        'mania': {
-            'count_geki': '(emj)mania_geki(emj)[8462491027363735/xg8OLGrR7u0ag052]',
-            'count_300': '(emj)mania_300(emj)[8462491027363735/8FP93o7iQC0ck07a]',
-            'count_katu': '(emj)mania_katu(emj)[8462491027363735/YGE81JV82K0bi06o]',
-            'count_100': '(emj)mania_100(emj)[8462491027363735/WAN7y7AwWk0a406g]',
-            'count_50': '(emj)mania_50(emj)[8462491027363735/OLG23veds207w06a]',
-            'count_miss': '(emj)mania_miss(emj)[8462491027363735/KPYhAwmthM0a205i]',
+        MODS = {
+            'EZ': '(emj)modEZ(emj)[6147923945822473/BNm1HKXTk301900w]',
+            'NF': '(emj)modNF(emj)[6147923945822473/liWefVzool01900w]',
+            'HT': '(emj)modHT(emj)[6147923945822473/oVrgtIv5BW01900w]',
+            'HR': '(emj)modHR(emj)[6147923945822473/oB4q89gfRE01900w]',
+            'SD': '(emj)modSD(emj)[6147923945822473/K4xZkmHBOm01900w]',
+            'DT': '(emj)modDT(emj)[6147923945822473/uvBekQGLHX01900w]',
+            'NC': '(emj)modNC(emj)[6147923945822473/SymPZhKRlb01900w]',
+            'HD': '(emj)modHD(emj)[6147923945822473/cysdyeOJId01900w]',
+            'FL': '(emj)modFL(emj)[6147923945822473/GYm7PCDgou01900w]',
+            'RX': '(emj)modRX(emj)[6147923945822473/aSRnt2vWQg01900w]',
+            'AP': '(emj)modAP(emj)[6147923945822473/OUA0zUyX2b01900w]',
+            'SO': '(emj)modSO(emj)[6147923945822473/TNVTcHV0V501900w]',
+            'TD': '(emj)modTD(emj)[6147923945822473/Saao0maPAY01800u]',
+            'FI': '(emj)modFI(emj)[6147923945822473/E0VrPzEsuX01900w]',
+            '4K': '(emj)mod4K(emj)[6147923945822473/Askp34kfZP01900w]',
+            '5K': '(emj)mod5K(emj)[6147923945822473/5PA4gUK4mB01900w]',
+            '6K': '(emj)mod6K(emj)[6147923945822473/S2U1YjFAmu01900w]',
+            '7K': '(emj)mod7K(emj)[6147923945822473/RGNf6tKsi701900w]',
+            '8K': '(emj)mod8K(emj)[6147923945822473/OouSGtpccB01900w]',
+            '9K': '(emj)mod9K(emj)[6147923945822473/gq2Ex1yTaU01900w]',
+            'MR': '(emj)modMR(emj)[6147923945822473/sztiOBFLwX01900w]',
+            'NM': '(emj)modNM(emj)[6147923945822473/PdcDWD2Tsg01900w]'
         }
-    }
+
+        RANKS = {
+            'A': '(emj)rankA(emj)[6147923945822473/3t1aVcRJLk03g01q]',
+            'B': '(emj)rankB(emj)[6147923945822473/lu1xQGVxHc03g01q]',
+            'C': '(emj)rankC(emj)[6147923945822473/QRj5ZPzUM203g01q]',
+            'D': '(emj)rankD(emj)[6147923945822473/qksOqZNjle03g01q]',
+            'F': '(emj)rankF(emj)[6147923945822473/HkOLe5XdJN03g01q]',
+            'S': '(emj)rankS(emj)[6147923945822473/Pg9N2rp2rg03g01q]',
+            'SH': '(emj)rankSH(emj)[6147923945822473/nBEToRSz4w03f01q]',
+            'X': '(emj)rankX(emj)[6147923945822473/Xj41eVcF2003g01q]',
+            'XH': '(emj)rankXH(emj)[6147923945822473/TQnmo93NY003g01q]'
+        }
+
+        MODES = {
+            0: '(emj)modeOSU(emj)[6147923945822473/adAvlRGhPU0rs0rs]',
+            1: '(emj)modeTaiko(emj)[6147923945822473/uC0ixh9gwg0rs0rs]',
+            2: '(emj)modeFruits(emj)[6147923945822473/eT3zJk3Dmi0rs0rs]',
+            3: '(emj)modeMania(emj)[6147923945822473/NlwJP3fylJ0rs0rs]'
+        }
+
+        STATUS = {
+            'ranked': '(emj)ranked(emj)[6147923945822473/XRH8X7Jzq201s01s]',
+            'approved': '(emj)approved(emj)[6147923945822473/XviIgvKOaG01s01s]',
+            'qualified': '(emj)qualified(emj)[6147923945822473/G5cBjKEYut01s01s]',
+            'loved': '(emj)loved(emj)[6147923945822473/76HKRBtX5Z01s01s]',
+            'pending': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
+            'wip': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
+            'graveyard': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]'
+        }
+
+        STATISTICS = {
+            'osu': {
+                'count_300': '(emj)osu_300(emj)[8462491027363735/RFCyQ9F2Br05q03c]',
+                'count_100': '(emj)osu_100(emj)[8462491027363735/lNVVxabQ5r05e036]',
+                'count_50': '(emj)osu_50(emj)[8462491027363735/Kf1273LpyI03y036]',
+                'count_miss': '(emj)osu_miss(emj)[8462491027363735/fs3hty0W2b03m03m]',
+                'count_geki': '(emj)osu_geki(emj)[8462491027363735/CVsCY4rjcp04i04k]',
+                'count_katu': '(emj)osu_katu(emj)[8462491027363735/diU6rW35Yl03e03g]'
+            },
+
+            'taiko': {
+                'count_300': '(emj)taiko_300(emj)[8462491027363735/fNZwGrjeo70ao0ao]',
+                'count_100': '(emj)taiko_100(emj)[8462491027363735/gE40WXpzib0ao0ao]',
+                'count_miss': '(emj)taiko_miss(emj)[8462491027363735/pwAOUL8tA608w08w]',
+            },
+
+            'fruits': {
+                'count_300': '(emj)fruits_300(emj)[8462491027363735/uo3Lc0029602v02w]',
+                'count_100': '(emj)fruits_100(emj)[8462491027363735/LMrnKuBHHh02602t]',
+                'count_katu': '(emj)fruits_katu(emj)[8462491027363735/yDSk3XFqua01o01z]',
+                'count_miss': '(emj)fruits_miss(emj)[8462491027363735/vz739p9XHy02c02b]'
+            },
+
+            'mania': {
+                'count_geki': '(emj)mania_geki(emj)[8462491027363735/xg8OLGrR7u0ag052]',
+                'count_300': '(emj)mania_300(emj)[8462491027363735/8FP93o7iQC0ck07a]',
+                'count_katu': '(emj)mania_katu(emj)[8462491027363735/YGE81JV82K0bi06o]',
+                'count_100': '(emj)mania_100(emj)[8462491027363735/WAN7y7AwWk0a406g]',
+                'count_50': '(emj)mania_50(emj)[8462491027363735/OLG23veds207w06a]',
+                'count_miss': '(emj)mania_miss(emj)[8462491027363735/KPYhAwmthM0a205i]',
+            }
+        }

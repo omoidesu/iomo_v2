@@ -15,15 +15,15 @@ def time_format(secs: int):
 
 
 def count_delta(now, history, rank=False):
-    delta = now - history
+    delta = round(now - history, 2)
     if delta > 0:
         if rank:
-            return f'↓{delta}'
-        return f'↑{delta}'
+            return f'↓ {delta}'
+        return f'↑ {delta}'
     elif delta < 0:
         if rank:
-            return f'↑{-delta}'
-        return f'↓{-delta}'
+            return f'↑ {-delta}'
+        return f'↓ {-delta}'
     else:
         if rank:
             return '-'

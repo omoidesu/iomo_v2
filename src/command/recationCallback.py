@@ -14,11 +14,11 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
     recent_score = await api.get_recent_score(dto.osu_id, dto.osu_mode, 50, include_fail=dto.include_fail,
                                               use_mode=True)
     if len(recent_score) == 0:
-        return '找不到这个记录了'
+        return '找不到这个记录'
 
     target_score = [score for score in recent_score if score.get('id') == score_id]
     if not target_score:
-        return '找不到这个记录了'
+        return '找不到这个记录'
 
     score = target_score[0]
 

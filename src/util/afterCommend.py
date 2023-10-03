@@ -48,6 +48,7 @@ def cache_map_to_redis(msg_id: str, dto: RecentListCacheDTO):
     redis = Redis.instance().get_connection()
 
     redis.set(msg_id, dto.to_json_str())
+    redis.expire(msg_id, 24 * 60 * 60)
 
 
 async def add_reaction(bot: Bot, msg_id: str, raw_msg: Message, user_id: str, dto: RecentListCacheDTO):

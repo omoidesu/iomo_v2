@@ -1,7 +1,7 @@
 from khl.card import Card, Element, Module, Struct, Types
 from khl.card.interface import _Module
 
-from src.const import Assets, Sticker
+from src.const import Assets
 from src.util import convert_date, seconds_to_str
 
 
@@ -129,7 +129,7 @@ class Modules:
                          type=Types.Text.KMD)
         ]
 
-        stickers = Sticker.STATISTICS.get(mode)
+        stickers = Assets.Sticker.STATISTICS.get(mode)
         for key in stickers.keys():
             paragraphs.append(
                 Element.Text(f'{stickers.get(key)}: {statistics.get(key)}', type=Types.Text.KMD)
