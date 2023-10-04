@@ -60,7 +60,22 @@ class BeatmapSet:
         self.title_unicode = kwargs.get('title_unicode')
         self.status = beatmap_status.get(kwargs.get('status'))
         self.cover_list = kwargs.get('covers', {}).get('list')
-        beatmap = kwargs.get('beatmaps')
-        if beatmap is not None:
-            self.beatmaps = [Beatmap(**b) for b in beatmap]
-            self.beatmaps = sorted(self.beatmaps, key=lambda x: x.difficulty_rating)
+        beatmaps = kwargs.get('beatmaps')
+        if beatmaps is not None:
+            beatmaps = [Beatmap(**b) for b in beatmaps]
+            beatmaps = sorted(beatmaps, key=lambda x: x.difficulty_rating)
+
+            # 根据mode分组
+            osu_map, taiko_map, catch_map, mania_map = [], [], [], []
+
+            for map in beatmaps:
+                if map.mode == 'osu':
+                    osu_map.append(map)
+                elif map.mode == 'taiko':
+                    taiko_map.append(map)
+                elif map.mode == 'fruits':
+                    catch_map.append(map)
+                elif map.mode == 'mania':
+                    mania_map.append(map)
+
+            self.beatmaps = osu_map + taiko_map + catch_map + mania_map
