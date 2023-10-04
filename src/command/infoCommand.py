@@ -15,12 +15,7 @@ async def info_command(bot: Bot, osu_name: str, mode: str, day: int, user_id):
         else:
             user_info = await api.get_user(osu_name, mode=mode, use_mode=True)
     except OsuApiException as e:
-        if e.code == 401:
-            return e.message
-        elif e.code == 404:
-            return '该用户不存在'
-        else:
-            return f'未知错误，code:{e.code}'
+        return e.do_except('该用户不存在')
     else:
         if user_id:
             compare_info = user_info_service.select_user_info(user_id, mode=mode, day=day)

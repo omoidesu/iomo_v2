@@ -24,14 +24,9 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
 
     try:
         recent_score = await api.get_recent_score(osu_name, mode=mode, include_fail=include_fail, use_mode=True,
-                                                  limit=order if order else 20)
+                                                  limit=20)
     except OsuApiException as e:
-        if e.code == 401:
-            return e.message, None
-        elif e.code == 404:
-            return '该用户不存在', None
-        else:
-            return f'未知错误，code:{e.code}', None
+        return e.do_except('该用户不存在'), None
     else:
         if len(recent_score) == 0:
             return '该用户没有最近游玩记录', None
@@ -86,7 +81,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             return card_msg, dto
 
         # 如果输入的order大于记录数则查找最后一个记录
-        if order is not None:
+        if order:
             if order > len(recent_score):
                 score = recent_score[-1]
             else:
@@ -95,6 +90,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             score = recent_score[0]
 
         beatmap_set = score.get('beatmapset', {})
+        beatmap = score.get('beatmap', {})
         kwargs = {}
         # 封面
         cover: str = beatmap_set.get('covers', {}).get('list')
@@ -105,7 +101,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         if preview is not None:
             kwargs['preview'] = await download_and_upload(bot, preview)
 
-        difficult = score.get('beatmap', {}).get('difficulty_rating')
+        difficult = beatmap.get('difficulty_rating')
         kwargs['star'] = await generate_diff_png_and_upload(bot, mode, difficult)
 
         # 保存beatmapset
@@ -116,13 +112,9 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
                 creator=beatmap_set.get('creator')
             ))
 
-        # 调用sayo api取得max combo
-        sayo_info = await SayoApi.get_beatmap_info(beatmap_set.get('id'))
-        if sayo_info.get('status') == 0:
-            beatmap_id = score.get('beatmap', {}).get('id')
-            bid_info = [item for item in sayo_info.get('data').get('bid_data') if item.get('bid') == beatmap_id]
-            if bid_info:
-                kwargs['fc_combo'] = bid_info[0].get('maxcombo')
+        # 获取max combo
+        beatmap_info = await api.get_beatmap_info(beatmap.get('id'))
+        kwargs['fc_combo'] = beatmap_info.get('max_combo')
 
         # todo: 计算模拟pp
         kwargs['fc'] = '-'
@@ -133,6 +125,6 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         kwargs['ss'] = '-'
 
         redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
-        redis.set(redis_key, score.get('beatmap', {}).get('id'))
+        redis.set(redis_key, beatmap.get('id'))
 
-        return score_card(score, **kwargs), None
+        return score_card(score, beatmap, beatmap_set, **kwargs), None

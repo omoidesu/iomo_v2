@@ -1,57 +1,28 @@
 from khl import Bot, Message
 
 from src.command import info_command
-from src.const import game_mode_convent
 from src.service import user_service
 from src.util.log import save_log
+from ._commonParser import args_parser
 
 
 async def info_parser(bot: Bot, msg: Message, *args):
     # 发送人kook id
     kook_id = save_log(msg, *args)
 
-    # 判断消息内有没有@人
-    mention = False
-    if len(msg.mention) > 0:
-        mention = True
+    # 解析参数
+    require_args = args_parser(*args)
+    osu_name = require_args['keyword']
+    mode = require_args['mode']
+    day = require_args['order']
 
     # 初始化变量
-    mode, day = '', 0
-    mode_index, day_index = -1, -1
     target_kook_id = 0
     user_id = 0
     user = None
 
-    for arg in args:
-        # 判断查询的模式
-        if mode == '' and arg.startswith(':'):
-            mode = arg[1:]
-            if mode not in game_mode_convent.keys():
-                return 'mode参数错误'
-            mode = game_mode_convent.get(mode)
-            mode_index = args.index(arg)
-            continue
-        # 判断对比天数
-        if day == 0 and arg.startswith('#'):
-            day = arg[1:]
-            if not day.isdigit():
-                return 'day参数必须为数字'
-            if int(day) <= 0:
-                return 'day参数不能为负数'
-            day_index = args.index(arg)
-
-    # 如果模式位置和天数位置都是初始值则所有元素都是用户名
-    if mode_index + day_index == -2:
-        osu_name = ' '.join(args)
-    # 如果两个位置其中有一个是初始值则不是初始值的之前元素是用户名
-    elif mode_index * day_index < 0:
-        osu_name = ' '.join(args[:max(mode_index, day_index)])
-    # 如果两个位置都不是初始值则位置最小的之前是用户名
-    else:
-        osu_name = ' '.join(args[:min(mode_index, day_index)])
-
     # 如果有@人则查询osu信息是被@人绑定的信息
-    if mention:
+    if len(msg.mention) > 0:
         target_kook_id = int(msg.mention[0])
     # 如果用户名为空则查询的是发送人的信息
     elif osu_name == '':

@@ -14,13 +14,24 @@ _taiko = 'taiko'
 _fruits = 'fruits'
 _mania = 'mania'
 
+osu_source = 'osu'
+sayo_source = 'sayo'
+
 game_modes = (_osu, _taiko, _fruits, _mania)
 
-game_mode_convent = {
+# 匹配更多参数
+game_mode_map = {
     '0': _osu, '1': _taiko, '2': _fruits, '3': _mania,
-    'ctb': _fruits, 'catch': _fruits, 'std': _osu,
-    'osu': _osu, 'taiko': _taiko, 'mania': _mania, 'fruits': _fruits
+    'osu': _osu, 'taiko': _taiko, 'mania': _mania, 'fruits': _fruits,
+    'ctb': _fruits, 'catch': _fruits, 'std': _osu
 }
+
+search_source_map = {
+    'osu': osu_source, 'ppy': osu_source, 'o': osu_source,
+    'sayo': sayo_source, 'sy': sayo_source, 'sayobot': sayo_source, 's': sayo_source
+}
+
+no_leaderboard_status = (-2, -1, 0)
 
 mods = {
     'NM': 0,

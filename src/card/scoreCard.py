@@ -4,14 +4,12 @@ from src.const import Assets
 from ._modules import Modules
 
 
-def score_card(score_info: dict, **kwargs):
+def score_card(score_info: dict, beatmap: dict, beatmap_set: dict, **kwargs):
     mode = score_info.get('mode')
-    beatmap_set = score_info.get('beatmapset')
-    beatmap = score_info.get('beatmap')
 
     title_unicode = beatmap_set.get('title_unicode').replace('*', '\\*')
 
-    header = Modules.score_header(score_info, kwargs.get('star'))
+    header = Modules.score_header(score_info, beatmap, beatmap_set, kwargs.get('star'), position=kwargs.get('position'))
     map_info = Modules.beatmap_info(beatmap_set, beatmap, mode, kwargs.get('cover'))
     statistics = Modules.play_statistics(score_info, kwargs.get('fc_combo'))
     pp_module = Modules.pp_module(**kwargs)

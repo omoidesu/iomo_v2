@@ -9,6 +9,7 @@ from src.util.uploadAsset import download_and_upload
 from .infoParser import info_parser
 from .reactionParser import ReactionParser
 from .recentParser import recent_parser
+from .scoreParser import score_parser
 
 reaction_parser = ReactionParser.instance()
 
@@ -43,12 +44,7 @@ async def bind_parser(bot: Bot, msg: Message, *args):
 
         return user_card(user_info, **kwargs), {str(user_info.get('id')): user.id}
     except OsuApiException as e:
-        if e.code == 401:
-            return e.message, None
-        elif e.code == 404:
-            return '该用户不存在', None
-        else:
-            return f'未知错误，code:{e.code}', None
+        return e.do_except('绑定失败，请输入正确的osu用户名'), None
 
 
 async def unbind_parser(msg: Message, *args):

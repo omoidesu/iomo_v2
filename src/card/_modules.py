@@ -63,11 +63,10 @@ class Modules:
                               mode=Types.SectionMode.RIGHT)
 
     @staticmethod
-    def score_header(score_info: dict, difficult_image: str, position: int = 0) -> list[_Module]:
+    def score_header(score_info: dict, beatmap: dict, beatmapset: dict, difficult_image: str, position: int = 0) -> \
+            list[_Module]:
         modules = []
 
-        beatmapset = score_info.get('beatmapset')
-        beatmap = score_info.get('beatmap')
         user = score_info.get('user')
 
         source = beatmapset.get('source')
@@ -103,9 +102,7 @@ class Modules:
         else:
             for mod in mods:
                 context2.append(Element.Image(Assets.Image.MOD.get(mod)))
-        context2.append(Element.Text(f' | {create_at}'))
-        if position:
-            context2.append(Element.Text(f' | #{position}'))
+        context2.append(Element.Text(f' | {create_at}' + (f' | #{position}' if position else '')))
         modules.append(context2)
 
         return modules

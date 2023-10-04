@@ -134,7 +134,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取bp失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -148,7 +148,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取成绩失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -162,7 +162,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取成绩失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -173,7 +173,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取谱面信息失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -184,19 +184,22 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取谱面集信息失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
-    async def search_beatmapset(self, keyword: str, mode: str, cursor_string: str, include_unrank: bool = False):
+    async def search_beatmapset(self, keyword: str, mode: str = None, cursor_string: str = '',
+                                include_unrank: bool = False):
         """搜索谱面集"""
         modes = {'osu': 0, 'taiko': 1, 'fruits': 2, 'mania': 3}
 
         url = f'{osu_api}/beatmapsets/search'
         params = {
-            'q': keyword,
-            'cursor_string': cursor_string
+            'q': keyword
         }
+
+        if cursor_string:
+            params['cursor_string'] = cursor_string
 
         if mode is not None:
             params['m'] = modes.get(mode)
@@ -207,7 +210,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'搜索谱面集失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -221,7 +224,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取mp房间列表失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -236,7 +239,7 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取mp游戏信息失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
@@ -250,32 +253,27 @@ class OsuApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取全球排行榜失败 code: {resp.status}')
+                    raise OsuApiException(resp.status)
 
                 return await resp.json()
 
 
 class SayoApi:
     @staticmethod
-    async def search(keyword: str, mode: int, beatmap_status: int):
+    async def search(keyword: str, mode: int, offset: str = '', beatmap_status: int = 7):
         """
             sayo api搜索谱面
             文档：https://www.showdoc.com.cn/SoulDee/3969517351482508
         """
         url = f'{sayo_api}/?post'
 
-        if mode is None:
-            mode = 15
-
-        if beatmap_status is None:
-            beatmap_status = 7
-
         data = {
             'class': beatmap_status,
             'cmd': 'beatmaplist',
             'keyword': keyword,
-            'mode': mode,
+            'mode': mode if mode else 15,
             'type': 'search',
+            'offset': 0 if not offset else offset
         }
 
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:

@@ -1,62 +1,26 @@
 from khl import Bot, Message
 
 from src.command import recent_command
-from src.const import game_mode_convent
 from src.dao.models import OsuUser
-from src.exception import ArgsException
 from src.service import user_service
-from src.util import mods_parser
 from src.util.log import save_log
+from ._commonParser import args_parser
 
 
 async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
     # 发送人kook id
     kook_id = save_log(msg, *args)
 
-    # 初始化变量
-    mode, mod, order, ls_mode = '', [], None, False
-    index = {'mode': -1, 'mod': -1, 'order': -1, 'ls': -1}
+    require_args = args_parser(*args)
+    osu_name = require_args['keyword']
+    mods = require_args['mods']
+    mode = require_args['mode']
+    order = int(require_args['order'])
+
     target_kook_id = 0
-    ls_mode_command = ('-list', '-ls')
-
-    for arg in args:
-        arg_index = args.index(arg)
-        if not ls_mode and arg in ls_mode_command:
-            ls_mode = True
-            index['ls'] = arg_index
-            continue
-        # 查询模式
-        if mode == '' and arg.startswith(':'):
-            mode = arg[1:]
-            if mode not in game_mode_convent.keys():
-                return 'mode参数错误', None
-            mode = game_mode_convent.get(mode)
-            index['mode'] = arg_index
-            continue
-        # 查询mod
-        if not mod and arg.startswith('+'):
-            mods: str = arg[1:]
-            try:
-                mod = mods_parser(mods)
-                index['mod'] = arg_index
-                continue
-            except ArgsException as e:
-                return e.message, None
-        if not order and arg.startswith('#'):
-            order = arg[1:]
-            if not order.isdigit():
-                return 'order参数必须为数字', None
-            if int(order) <= 0:
-                return 'order参数必须为正整数', None
-            order = int(order)
-            index['order'] = arg_index
-
-    # 如果变量位置都是初始值则所有元素都是用户名
-    if sum(index.values()) == -1 * len(index):
-        osu_name = ' '.join(args)
-    # 找出不是初始位置的最小值，该位置前的元素都是用户名
-    else:
-        osu_name = ' '.join(args[:min(i for i in index.values() if i >= 0)])
+    ls_mode = False
+    if '-ls' in args or '-list' in args:
+        ls_mode = True
 
     # 如果有@人则查询osu信息是被@人绑定的信息
     if len(msg.mention) > 0:
@@ -75,4 +39,4 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
         if mode == '':
             mode = user.default_mode
 
-    return await recent_command(bot, msg, osu_name, mode, mod, order, include_fail, ls_mode)
+    return await recent_command(bot, msg, osu_name, mode, mods, order, include_fail, ls_mode)

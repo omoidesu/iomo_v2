@@ -1,7 +1,8 @@
-from khl import Bot, Event, EventTypes, Message, User
+from khl import Bot, Event, EventTypes, GameTypes, Message, User
 
-from src.config import bot_token
-from src.parser import (bind_parser, info_parser, ping_parser, reaction_parser, recent_parser, unbind_parser)
+from src.config import bot_token, playing_game_id
+from src.parser import (bind_parser, info_parser, ping_parser, reaction_parser, recent_parser, unbind_parser,
+                        score_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -9,9 +10,10 @@ me: User
 
 
 @bot.on_startup
-async def on_startup(bot: Bot):
+async def on_startup(b: Bot):
     global me
-    me = await bot.client.fetch_me()
+    me = await b.client.fetch_me()
+    await b.client.update_playing_game(playing_game_id)
 
 
 @bot.command(name='prpr', aliases=['ping'], prefixes=['.'])
@@ -58,6 +60,12 @@ async def precent(msg: Message, *args):
         await add_reaction(bot, reply_msg.get('msg_id'), msg, me.id, cache_dto)
 
 
+@bot.command(name='score', aliases=['s'], prefixes=['.'])
+async def score(msg: Message, *args):
+    reply = await score_parser(bot, msg, *args)
+    await msg.reply(reply)
+
+
 @bot.on_event(EventTypes.ADDED_REACTION)
 async def on_added_emoji(bot: Bot, e: Event):
     msg_id = e.body.get('msg_id')
@@ -70,3 +78,11 @@ async def on_added_emoji(bot: Bot, e: Event):
 
     await reaction_parser.insert_reaction(bot, me.id, {'msg_id': msg_id, 'user_id': user_id, 'emoji_id': emoji_id,
                                                        'channel_id': channel_id})
+
+
+def save_cardmsg(reply):
+    import json
+    import os
+
+    with open(os.path.join(os.path.dirname(__file__), 'card_message.json'), 'w', encoding='utf-8') as f:
+        json.dump(reply, f, ensure_ascii=False, indent=4)

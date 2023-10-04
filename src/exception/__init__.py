@@ -17,21 +17,19 @@ class NetException(Exception):
 
 class OsuApiException(NetException):
     _code: int
-    _message: str
 
     def __init__(self, code):
         self._code = code
-
-        if code == 401:
-            super().__init__('token过期')
-            self._message = 'token过期'
-        else:
-            super().__init__(code)
+        super().__init__(code)
 
     @property
     def code(self):
         return self._code
 
-    @property
-    def message(self):
-        return self._message
+    def do_except(self, message: str):
+        if self._code == 401:
+            return 'token过期'
+        elif self._code == 404:
+            return message
+        else:
+            return f'未知错误，code:{self._code}'
