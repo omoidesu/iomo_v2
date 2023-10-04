@@ -32,6 +32,11 @@ search_source_map = {
 }
 
 no_leaderboard_status = (-2, -1, 0)
+beatmap_status = {
+    -2: 'graveyard', -1: 'wip', 0: 'pending', 1: 'ranked', 2: 'approved', 3: 'qualified', 4: 'loved',
+    'graveyard': 'graveyard', 'wip': 'wip', 'pending': 'pending', 'ranked': 'ranked', 'approved': 'approved',
+    'qualified': 'qualified', 'loved': 'loved'
+}
 
 mods = {
     'NM': 0,
@@ -75,6 +80,16 @@ class Assets:
         DEFAULT_AVATAR = 'https://img.kookapp.cn/assets/2022-09/DB3C2HLwkO03k03k.png'
         DEFAULT_COVER = 'https://img.kookapp.cn/assets/2022-09/sJPuzoIpf40p0069.png'
         OSU_LOGO = 'https://img.kookapp.cn/assets/2022-09/Hhm2wv3txG09q09q.png'
+
+        LOADING = (
+            'https://img.kookapp.cn/assets/2023-10/BCw58EdK0j0go04b.gif',
+            'https://img.kookapp.cn/assets/2023-10/s3R4C33yew0go04b.gif',
+            'https://img.kookapp.cn/assets/2023-10/4AGLagrPkn0go04b.gif',
+            'https://img.kookapp.cn/assets/2023-10/t8f8IyUKci0go04b.gif',
+            'https://img.kookapp.cn/assets/2023-10/3QwbaOVEY00go04b.gif',
+            'https://img.kookapp.cn/assets/2023-10/EYq6hR9JYI0go04b.gif'
+        )
+
         MOD = {
             '4K': 'https://img.kaiheila.cn/assets/2021-08/24/G86hJnf5pt01900w.png',
             '5K': 'https://img.kaiheila.cn/assets/2021-08/24/DEMNjj2veT01900w.png',
@@ -201,6 +216,13 @@ class Assets:
             'pending': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
             'wip': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]',
             'graveyard': '(emj)graveyard(emj)[6147923945822473/13i0mTUlQp01s01s]'
+        }
+
+        DIFF = {
+            'osu': '(emj)osu(emj)[8462491027363735/PX5lqCvifT0dw0dw]',
+            'taiko': '(emj)taiko(emj)[8462491027363735/Bcthix30NE0dw0dw]',
+            'fruits': '(emj)fruits(emj)[8462491027363735/bYaumasgZB0dw0dw]',
+            'mania': '(emj)mania(emj)[8462491027363735/DcAywzHQng0dw0dw]'
         }
 
         STATISTICS = {

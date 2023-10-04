@@ -1,25 +1,43 @@
-from khl import Bot, Event, EventTypes, GameTypes, Message, User
+from khl import Bot, Event, EventTypes, Guild, Message, User
 
-from src.config import bot_token, playing_game_id
-from src.parser import (bind_parser, info_parser, ping_parser, reaction_parser, recent_parser, unbind_parser,
-                        score_parser)
-from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
+from src.card import search_waiting_card
+from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
+from src.parser import (bind_parser, compare_parser, info_parser, ping_parser, reaction_parser, recent_parser,
+                        score_parser, search_parser, unbind_parser)
+from src.util import update_to_card
+from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info, delete_emojis
 
 bot = Bot(token=bot_token)
 me: User
+emoji_guild: Guild
 
 
 @bot.on_startup
 async def on_startup(b: Bot):
     global me
+    global emoji_guild
     me = await b.client.fetch_me()
     await b.client.update_playing_game(playing_game_id)
+
+    emoji_guild = await bot.client.fetch_guild(guild_id)
 
 
 @bot.command(name='prpr', aliases=['ping'], prefixes=['.'])
 async def ping(msg: Message, *args):
     reply = ping_parser(msg, *args)
     await msg.reply(reply)
+
+
+@bot.command(name='clear')
+async def clear_emoji(msg: Message):
+    if msg.author.id in admin_id:
+        emoji_list = await emoji_guild.fetch_emoji_list()
+        for emoji in emoji_list:
+            await emoji_guild.delete_emoji(emoji)
+
+        await msg.reply(f'清理完成，总共清理了{len(emoji_list)}个表情')
+    else:
+        await msg.reply('你不是管理员，无权使用该命令')
 
 
 @bot.command(name='bind', prefixes=['.'])
@@ -64,6 +82,20 @@ async def precent(msg: Message, *args):
 async def score(msg: Message, *args):
     reply = await score_parser(bot, msg, *args)
     await msg.reply(reply)
+
+
+@bot.command(name='compare', aliases=['c'], prefixes=['.'])
+async def compare(msg: Message):
+    reply = await compare_parser(bot, msg)
+    await msg.reply(reply)
+
+
+@bot.command(name='search', prefixes=['.'])
+async def search(msg: Message, *args):
+    waiting = await msg.reply(search_waiting_card())
+    reply, emojis, waiting_msg = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
+    await update_to_card(bot, waiting_msg, reply)
+    await delete_emojis(emoji_guild, emojis)
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)

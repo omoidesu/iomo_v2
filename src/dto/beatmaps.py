@@ -1,3 +1,6 @@
+from src.const import beatmap_status
+
+
 class Beatmap:
     id: int
     difficulty_rating: float
@@ -9,6 +12,7 @@ class Beatmap:
     cs: float
     accuracy: float  # od
     drain: float  # hp
+    status: str
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
@@ -21,6 +25,7 @@ class Beatmap:
         self.cs = kwargs.get('cs')
         self.accuracy = kwargs.get('accuracy')
         self.drain = kwargs.get('drain')
+        self.status = beatmap_status.get(kwargs.get('status'))
 
     @property
     def od(self):
@@ -40,7 +45,9 @@ class BeatmapSet:
     play_count: int
     title: str
     title_unicode: str
-    beatmap: list[Beatmap]
+    status: str
+    cover_list: str
+    beatmaps: list[Beatmap]
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
@@ -51,6 +58,9 @@ class BeatmapSet:
         self.play_count = kwargs.get('play_count')
         self.title = kwargs.get('title')
         self.title_unicode = kwargs.get('title_unicode')
+        self.status = beatmap_status.get(kwargs.get('status'))
+        self.cover_list = kwargs.get('covers', {}).get('list')
         beatmap = kwargs.get('beatmaps')
         if beatmap is not None:
-            self.beatmap = [Beatmap(**b) for b in beatmap]
+            self.beatmaps = [Beatmap(**b) for b in beatmap]
+            self.beatmaps = sorted(self.beatmaps, key=lambda x: x.difficulty_rating)

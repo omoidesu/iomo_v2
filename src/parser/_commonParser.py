@@ -82,7 +82,7 @@ def args_parser(*args):
     else:
         smallest_index = min(i for i in index.values() if i >= 0)
         # 上面-x参数记录的是后面的值的位置，所以要减一
-        if args[smallest_index] in ('-f', '-b', '-s', '-u'):
+        if args[smallest_index - 1] in ('-f', '-b', '-s', '-u'):
             smallest_index -= 1
         keyword = ' '.join(args[:smallest_index])
 

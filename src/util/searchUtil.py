@@ -1,6 +1,6 @@
+from src.const import osu_source, sayo_source
 from src.dto import BeatmapSet
 from src.service import OsuApi, SayoApi
-from src.const import osu_source, sayo_source
 
 
 async def search_beatmap_sets(keyword: str, source: str, cursor_string: str, mode: str = None,
@@ -14,7 +14,9 @@ async def search_beatmap_sets(keyword: str, source: str, cursor_string: str, mod
             'cursor_string')
     elif source == sayo_source:
         mode_id = 15 if mode is None else {'osu': 1, 'taiko': 2, 'fruits': 4, 'mania': 8}[mode]
-        search_result = await SayoApi.search(keyword, mode_id, cursor_string, 31 if include_unrank else 7)
+        search_result = await SayoApi.search(keyword, mode_id, cursor_string)
+        if search_result.get('status') != 0:
+            return [], ''
         return [BeatmapSet(**{
             'id': beatmap_set.get('sid'),
             'artist': beatmap_set.get('artist'),

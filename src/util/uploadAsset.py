@@ -4,7 +4,7 @@ import math
 import aiohttp
 from PIL import Image
 from aiohttp import TCPConnector
-from khl import Bot
+from khl import Bot, Guild
 
 from src.asset import get_assets
 from src.const import Assets
@@ -12,10 +12,11 @@ from src.dao.models import OsuAsset, OsuStarAsset
 from src.service import asset_service, star_asset_service
 
 
-async def download_and_upload(bot: Bot, resource: str):
-    asset = asset_service.select_asset(resource)
-    if asset is not None:
-        return asset.oss_url
+async def download_and_upload(bot: Bot, resource: str, force: bool = False):
+    if not force:
+        asset = asset_service.select_asset(resource)
+        if asset is not None:
+            return asset.oss_url
 
     async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
         async with session.get(resource) as resp:
@@ -29,12 +30,13 @@ async def download_and_upload(bot: Bot, resource: str):
                 return kook_url
 
 
-async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float):
+async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: bool = False, guild: Guild = None):
     stars = round(diff, 2)
 
-    asset = star_asset_service.selectStarAssert(mode=mode, star=stars)
-    if asset is not None:
-        return asset.asset
+    if not emoji:
+        asset = star_asset_service.selectStarAssert(mode=mode, star=stars)
+        if asset is not None:
+            return asset.asset
 
     default = 115
     if 0 <= stars < 1:
@@ -56,7 +58,7 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float):
     elif 7 <= stars < 8:
         xp = 815
     else:
-        return Assets.Image.DIFF.get(mode)
+        return Assets.Sticker.DIFF.get(mode) if emoji else Assets.Image.DIFF.get(mode)
 
     assets = get_assets()
     x = (stars - math.floor(stars)) * default + xp
@@ -77,6 +79,9 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float):
 
     bytes_io = io.BytesIO()
     sm.save(bytes_io, format='png')
+    if emoji:
+        return await guild.create_emoji(emoji=io.BytesIO(bytes_io.getvalue()), name=str(diff))
+
     kook_url = await bot.client.create_asset(io.BytesIO(bytes_io.getvalue()))
 
     star_asset_service.insert(OsuStarAsset(mode=mode, star=stars, asset=kook_url))

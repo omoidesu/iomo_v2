@@ -1,4 +1,4 @@
-from khl import Bot, Message
+from khl import Bot, Guild, GuildEmoji, Message
 
 from src.const import game_modes
 from src.dao import Redis
@@ -56,3 +56,8 @@ async def add_reaction(bot: Bot, msg_id: str, raw_msg: Message, user_id: str, dt
 
     for emoji in dto.id_map.keys():
         await msg.add_reaction(emoji)
+
+
+async def delete_emojis(guild: Guild, emojis: list[GuildEmoji]):
+    for emoji in emojis:
+        await guild.delete_emoji(emoji)

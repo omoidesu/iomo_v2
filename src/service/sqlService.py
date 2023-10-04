@@ -49,7 +49,23 @@ class AssetService(__SqlService):
         super().__init__(1)
 
     def select_asset(self, source_url: str):
-        return self._session.query(OsuAsset).filter(OsuAsset.source_url == source_url).first()
+        return self._session.query(OsuAsset).filter(OsuAsset.source_url == source_url).ordet_by(
+            OsuAsset.create_time).first()
+
+    def select_asset_batch(self, **kwargs) -> dict:
+        """
+            批量查询，kwargs中key为标志，value为source_url
+            :param kwargs:
+            :return: dict key为标志 value为oss_url
+        """
+        result = {}
+        assets = self._session.query(OsuAsset).filter(OsuAsset.source_url.in_(kwargs.values())).all()
+        assets_map = {asset.source_url: asset.oss_url for asset in assets}
+        for key in kwargs.keys():
+            if assets_map.get(kwargs[key]):
+                result[key] = assets_map.get(kwargs[key])
+
+        return result
 
 
 class BeatmapService(__SqlService):

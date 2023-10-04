@@ -260,7 +260,7 @@ class OsuApi:
 
 class SayoApi:
     @staticmethod
-    async def search(keyword: str, mode: int, offset: str = '', beatmap_status: int = 7):
+    async def search(keyword: str, mode: int, offset: str = ''):
         """
             sayo api搜索谱面
             文档：https://www.showdoc.com.cn/SoulDee/3969517351482508
@@ -268,7 +268,6 @@ class SayoApi:
         url = f'{sayo_api}/?post'
 
         data = {
-            'class': beatmap_status,
             'cmd': 'beatmaplist',
             'keyword': keyword,
             'mode': mode if mode else 15,
@@ -277,7 +276,7 @@ class SayoApi:
         }
 
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
-            async with session.post(url, data=data) as resp:
+            async with session.post(url, data=json.dumps(data)) as resp:
                 if resp.status != 200:
                     raise OsuApiException(f'搜索谱面失败 code: {resp.status}')
 

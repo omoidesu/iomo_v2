@@ -1,5 +1,7 @@
 import json
 
+from .beatmaps import BeatmapSet
+
 
 class RecentListCacheDTO:
     _id_map: dict
@@ -53,3 +55,20 @@ class RecentListCacheDTO:
     @property
     def msg_id(self):
         return self._msg_id
+
+
+class SearchListCacheDTO:
+    _keyword: str
+    _pages: list[list[BeatmapSet]]
+
+    def __init__(self, keyword: str, pages: list[list[BeatmapSet]]):
+        self._keyword = keyword
+        self._pages = pages
+
+    @property
+    def keyword(self):
+        return self._keyword
+
+    @property
+    def pages(self):
+        return self._pages

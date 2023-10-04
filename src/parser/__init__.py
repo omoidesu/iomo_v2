@@ -6,10 +6,12 @@ from src.exception import OsuApiException
 from src.service import OsuApi, user_service
 from src.util.log import save_log
 from src.util.uploadAsset import download_and_upload
+from .compareParser import compare_parser
 from .infoParser import info_parser
 from .reactionParser import ReactionParser
 from .recentParser import recent_parser
 from .scoreParser import score_parser
+from .searchParser import search_parser
 
 reaction_parser = ReactionParser.instance()
 
