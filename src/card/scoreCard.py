@@ -13,7 +13,7 @@ def score_card(score_info: dict, beatmap: dict, beatmap_set: dict, **kwargs):
     map_info = Modules.beatmap_info(beatmap_set, beatmap, mode, kwargs.get('cover'))
     statistics = Modules.play_statistics(score_info, kwargs.get('fc_combo'))
     pp_module = Modules.pp_module(**kwargs)
-    download_module = Modules.download_module(beatmap_set.get('id'))
+    download_module = Modules.download_module(beatmap_set)
     music_module = Modules.music_module(kwargs.get('preview'), title_unicode, kwargs.get('cover'))
 
     card = Modules.card(*header, Modules.divider, map_info, Modules.divider, statistics, Modules.divider, pp_module,

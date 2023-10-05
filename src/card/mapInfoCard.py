@@ -5,7 +5,7 @@ from src.util import difficult_format, kmarkdown_format
 from ._modules import Modules
 
 
-def beatmap_set_card(beatmap_set: dict, **kwargs):
+def beatmap_set_card(beatmap_set: dict, beatmap_id: int = 0, **kwargs):
     beatmaps = beatmap_set.get('beatmaps')
     beatmaps = sorted(beatmaps, key=lambda x: x.get('difficulty_rating'))
     osu, taiko, fruits, mania = [], [], [], []
@@ -21,50 +21,83 @@ def beatmap_set_card(beatmap_set: dict, **kwargs):
 
     beatmaps = osu + taiko + fruits + mania
 
-    artist = kmarkdown_format(
-        beatmap_set.get('artist_unicode') if beatmap_set.get('artist_unicode') else beatmap_set.get('artist'))
-    title = kmarkdown_format(
-        beatmap_set.get('title_unicode') if beatmap_set.get('title_unicode') else beatmap_set.get('title'))
+    source = beatmap_set.get('source')
+    artist = kmarkdown_format(beatmap_set.get('artist'))
+    artist_unicode = kmarkdown_format(beatmap_set.get('artist_unicode'))
+    title = kmarkdown_format(beatmap_set.get('title'))
+    title_unicode = kmarkdown_format(beatmap_set.get('title_unicode'))
+
+    head = f'{source}({artist_unicode}) - {title_unicode}' if source else f'{artist_unicode} - {title_unicode}'
 
     user = beatmap_set.get('user')
 
     header = Module.Section(
-        Element.Text(f'**{Assets.Sticker.STATUS.get(beatmap_set.get("status"))}  {artist} - {title}**'))
-
-    banner = Modules.banner(kwargs.get('cover'))
+        Element.Text(f'**{Assets.Sticker.STATUS.get(beatmap_set.get("status"))}  {head}**'))
 
     info = Module.Context(Element.Image(user.get('avatar_url')))
     info.append(Element.Text(
-        f' [{user.get("username")}](https://osu.ppy.sh/users/{user.get("id")}) | set id: {beatmap_set.get("id")} | '))
-    info.append(Element.Image(Assets.Image.FAVOURITE))
-    info.append(Element.Text(f' {beatmap_set.get("favourite_count")} | '))
-    info.append(Element.Image(Assets.Image.PLAYCOUNT))
-    info.append(Element.Text(f' {beatmap_set.get("play_count")}'))
-
-    genre = Module.Section(
-        Struct.Paragraph(2, Element.Text(
+        f' [{user.get("username")}](https://osu.ppy.sh/users/{user.get("id")}) | {artist} - {title} | set id: {beatmap_set.get("id")} |'))
+    struct_content = [
+        Element.Text(
             f'**(font)流派: (font)[secondary]**(font){beatmap_set.get("genre", {}).get("name")}(font)[secondary]'),
-                         Element.Text(
-                             f'**(font)语言: (font)[secondary]**(font){beatmap_set.get("language", {}).get("name")}(font)[secondary]')))
+        Element.Text(
+            f'**(font)语言: (font)[secondary]**(font){beatmap_set.get("language", {}).get("name")}(font)[secondary]'),
+        Element.Text(
+            f'{Assets.Sticker.FAVOURITE} **(font)收藏数: (font)[secondary]**(font){beatmap_set.get("favourite_count")}(font)[secondary]'),
+        Element.Text(
+            f'{Assets.Sticker.PLAYCOUNT} **(font)游玩数: (font)[secondary]**(font){beatmap_set.get("play_count")}(font)[secondary]')
+    ]
+
+    genre = Module.Section(Struct.Paragraph(2, *struct_content))
 
     tags = Module.Context(Element.Text(f'**(font)tags: (font)[secondary]***{beatmap_set.get("tags")}*'))
+
+    banner = Modules.banner(kwargs.get('cover'))
 
     beatmap_infos = []
     for beatmap in beatmaps:
         mode = beatmap.get('mode')
         diff = beatmap.get('difficulty_rating')
-        beatmap_info = Module.Context(Element.Image(Assets.Image.STATUS.get(beatmap.get('status'))))
-        beatmap_info.append(Element.Image(kwargs.get(f'{mode}{diff}')))
-        beatmap_info.append(
-            Element.Text(
-                f' | ▸ id: {str(beatmap.get("id")).ljust(7, " ")} ▸ ★{difficult_format(diff)} ▸ 难度名: {beatmap.get("version")}'))
+        if beatmap_id and beatmap_id == beatmap.get('id'):
+            beatmap_info = Modules.beatmap_info({}, beatmap, beatmap.get('mode'), kwargs.get(f'{mode}{diff}'),
+                                                left_mode=True)
+        else:
+            beatmap_info = Module.Context(Element.Image(kwargs.get(f'{mode}{diff}')))
+            beatmap_info.append(Element.Text('|'))
+            beatmap_info.append(Element.Image(Assets.Image.STATUS.get(beatmap.get('status'))))
+            beatmap_info.append(
+                Element.Text(
+                    f'▸ id: {str(beatmap.get("id")).ljust(7, " ")} ▸ ★{difficult_format(diff)} ▸ 难度名: {beatmap.get("version")}'))
 
         beatmap_infos.append(beatmap_info)
 
-    download_module = Modules.download_module(beatmap_set.get('id'),
-                                              beatmap_set.get('availability', {}).get('download_disabled'))
+    download_module = Modules.download_module(beatmap_set)
 
-    music_module = Modules.music_module('https:' + beatmap_set.get('preview_url'), title, kwargs.get('cover_list'))
+    music_module = Modules.music_module('https:' + beatmap_set.get('preview_url'), title_unicode,
+                                        kwargs.get('cover_list'))
 
-    return CardMessage(Modules.card(header, banner, Modules.divider, info, genre, tags, Modules.divider, *beatmap_infos,
+    return CardMessage(Modules.card(header, info, genre, tags, Modules.divider, banner, Modules.divider, *beatmap_infos,
                                     Modules.divider, download_module, music_module, color='#33AAFF'))
+
+
+def beatmap_card(beatmap: dict, **kwargs):
+    beatmapset = beatmap.get('beatmapset')
+
+    source = beatmapset.get('source')
+    artist = kmarkdown_format(beatmapset.get('artist'))
+    artist_unicode = kmarkdown_format(beatmapset.get('artist_unicode'))
+    title = kmarkdown_format(beatmapset.get('title'))
+    title_unicode = kmarkdown_format(beatmapset.get('title_unicode'))
+
+    head = f'{source}({artist_unicode}) - {title_unicode}' if source else f'{artist_unicode} - {title_unicode}'
+    header = Module.Section(Element.Text(f'{Assets.Sticker.STATUS.get(beatmap.get("status"))}  **{head}**'))
+
+    context = Module.Context(Element.Image(kwargs.get('diff')))
+    context.append(Element.Text(f' | {artist} - {title}'))
+
+    map_info = Modules.beatmap_info(beatmapset, beatmap, beatmap.get('mode'), kwargs.get('cover'))
+
+    download_module = Modules.download_module(beatmapset)
+
+    return CardMessage(
+        Modules.card(header, context, Modules.divider, map_info, Modules.divider, download_module, color='#33AAFF'))

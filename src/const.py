@@ -155,14 +155,13 @@ class Assets:
         }
 
     class Sticker:
-        class Misc:
-            BPM = '(emj)bpm(emj)[6147923945822473/IuRZ4sJGs80fn0fn]'
-            CIRCLES = '(emj)circles(emj)[6147923945822473/Fg1qywTKmC0fn0fn]'
-            SLIDERS = '(emj)sliders(emj)[6147923945822473/qJeiQMdBQk0fn0fn]'
-            LENGTH = '(emj)length(emj)[6147923945822473/VPfMmUrAP90fn0fn]'
-            PROFILE = '(emj)profile(emj)[6147923945822473/UT3YVPbPI002s02s]'
-            PLAY = '(emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]'
-            FAVOURATE = '(emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]'
+        BPM = '(emj)bpm(emj)[6147923945822473/IuRZ4sJGs80fn0fn]'
+        CIRCLES = '(emj)circles(emj)[6147923945822473/Fg1qywTKmC0fn0fn]'
+        SLIDERS = '(emj)sliders(emj)[6147923945822473/qJeiQMdBQk0fn0fn]'
+        LENGTH = '(emj)length(emj)[6147923945822473/VPfMmUrAP90fn0fn]'
+        PROFILE = '(emj)profile(emj)[6147923945822473/UT3YVPbPI002s02s]'
+        PLAYCOUNT = '(emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]'
+        FAVOURITE = '(emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]'
 
         MODS = {
             'EZ': '(emj)modEZ(emj)[6147923945822473/BNm1HKXTk301900w]',

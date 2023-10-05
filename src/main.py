@@ -4,8 +4,7 @@ from src.card import search_waiting_card
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, compare_parser, info_parser, ping_parser, reaction_parser, recent_parser,
                         score_parser, search_parser, unbind_parser)
-from src.util import update_to_card
-from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info, delete_emojis
+from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
 me: User
@@ -93,11 +92,12 @@ async def compare(msg: Message):
 @bot.command(name='search', prefixes=['.'])
 async def search(msg: Message, *args):
     waiting = await msg.reply(search_waiting_card())
-    reply, emojis, waiting_msg = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
-    save_cardmsg(reply)
-    await update_to_card(bot, waiting_msg, reply)
-    if emojis:
-        await delete_emojis(emoji_guild, emojis)
+    waiting_msg, reply, func, *f_args = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
+    await waiting_msg.update(reply)
+    if func:
+        after = await func(*f_args)
+        if after:
+            await waiting_msg.update(after)
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)

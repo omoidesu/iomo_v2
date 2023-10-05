@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from src.const import mods
 from src.exception import ArgsException
 from .idGenerator import IdGenerator
-from .messageUtil import construct_message_obj, update_to_card
+from .messageUtil import construct_message_obj
 from .searchUtil import filter_and_sort_beatmap_sets, search_beatmap_sets
 
 

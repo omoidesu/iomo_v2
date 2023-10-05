@@ -1,7 +1,8 @@
 from khl import Bot, Guild, Message
 
-from src.command import search_command, beatmap_set_command
+from src.command import beatmap_command, beatmap_set_command, search_command
 from src.util import construct_message_obj
+from src.util.afterCommend import delete_emojis
 from src.util.log import save_log
 from ._commonParser import args_parser
 
@@ -18,18 +19,18 @@ async def search_parser(bot: Bot, msg: Message, guild: Guild, reply_msg_id: str,
     beatmapset_id = require_args['beatmap_set_id']
 
     if beatmap_id:
-        return None, None, reply_msg
+        card_msg, *new_args = await beatmap_command(bot, beatmap_id)
+        return reply_msg, card_msg, beatmap_set_command, bot, *new_args
     elif beatmapset_id:
-        return await beatmap_set_command(bot, beatmapset_id), None, reply_msg
+        return reply_msg, await beatmap_set_command(bot, beatmapset_id), None, None
     else:
         if not keyword:
-            return '请输入谱面信息', None, reply_msg
+            return reply_msg, '请输入谱面信息', None, None
 
         if ' - ' in keyword:
             artist, title = keyword.split(' - ', 1)
         else:
             artist, title = '', keyword
 
-    return_items: list = list(await search_command(bot, keyword, artist, title, source, guild))
-    return_items.append(reply_msg)
-    return return_items
+    card_msg, emojis = await search_command(bot, keyword, artist, title, source, guild)
+    return reply_msg, card_msg, delete_emojis, emojis

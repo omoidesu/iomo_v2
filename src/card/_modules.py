@@ -21,7 +21,9 @@ class Modules:
         return card
 
     @staticmethod
-    def download_module(beatmapset_id: int, download_disable: bool = False) -> _Module:
+    def download_module(beatmapset: dict) -> _Module:
+        beatmapset_id = beatmapset.get('id')
+        download_disable = beatmapset.get('availability', {}).get('download_disabled')
         if download_disable:
             ppy = f'~~[osu!](https://osu.ppy.sh/beatmapsets/{beatmapset_id})~~'
         else:
@@ -36,7 +38,7 @@ class Modules:
         return Module.Context(text)
 
     @staticmethod
-    def beatmap_info(beatmapset: dict, beatmap: dict, mode: str, cover: str) -> _Module:
+    def beatmap_info(beatmapset: dict, beatmap: dict, mode: str, cover: str, left_mode: bool = False) -> _Module:
         count_circles = beatmap.get('count_circles')
         count_sliders = beatmap.get('count_sliders')
         count_spinners = beatmap.get('count_spinners')
@@ -49,7 +51,7 @@ class Modules:
         stars = beatmap.get('difficulty_rating')
 
         rows = [
-            f'▸作者: {beatmapset.get("creator")} ▸谱面id: {beatmap.get("id")}',
+            f'> {Assets.Sticker.STATUS.get(beatmap.get("status"))} ▸id: {beatmap.get("id")} ▸ 难度名: {beatmap.get("version")}' if left_mode else f'▸作者: {beatmapset.get("creator")} ▸谱面id: {beatmap.get("id")}',
             f'▸长度: {seconds_to_str(beatmap.get("total_length"))} ▸BPM: {beatmap.get("bpm")} ▸物件数: {total_notes}',
             f'▸圈数: {count_circles} ▸滑条数: {count_sliders} ▸转盘数: {count_spinners}'
         ]
@@ -63,7 +65,7 @@ class Modules:
 
         cover = Assets.Image.OSU_LOGO if not cover else cover
         return Module.Section('\n'.join(rows), accessory=Element.Image(cover, size=Types.Size.SM),
-                              mode=Types.SectionMode.RIGHT)
+                              mode=Types.SectionMode.LEFT if left_mode else Types.SectionMode.RIGHT)
 
     @staticmethod
     def score_header(score_info: dict, beatmap: dict, beatmapset: dict, difficult_image: str, position: int = 0) -> \
