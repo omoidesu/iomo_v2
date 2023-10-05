@@ -3,7 +3,7 @@ from khl import Bot, Event, EventTypes, Guild, Message, User
 from src.card import search_waiting_card
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, button_queue, compare_parser, info_parser, ping_parser, reaction_queue,
-                        recent_parser, score_parser, search_parser, unbind_parser)
+                        recent_parser, score_parser, search_parser, unbind_parser, mode_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -21,7 +21,7 @@ async def on_startup(b: Bot):
     emoji_guild = await bot.client.fetch_guild(guild_id)
 
 
-@bot.command(name='prpr', aliases=['ping'], prefixes=['.'])
+@bot.command(name='prpr', aliases=['ping'], prefixes=['.', '/'])
 async def ping(msg: Message, *args):
     reply = ping_parser(msg, *args)
     await msg.reply(reply)
@@ -40,7 +40,7 @@ async def clear_emoji(msg: Message):
         await msg.reply('你不是管理员，无权使用该命令')
 
 
-@bot.command(name='bind', prefixes=['.'])
+@bot.command(name='bind', prefixes=['.', '/'])
 async def bind(msg: Message, *args):
     reply, id_map = await bind_parser(bot, msg, *args)
     await msg.reply(reply)
@@ -48,19 +48,25 @@ async def bind(msg: Message, *args):
         await collect_user_info(**id_map)
 
 
-@bot.command(name='unbind', prefixes=['.'])
+@bot.command(name='unbind', prefixes=['.', '/'])
 async def unbind(msg: Message, *args):
     reply = await unbind_parser(msg, *args)
     await msg.reply(reply)
 
 
-@bot.command(name='info', prefixes=['.'])
+@bot.command(name='info', prefixes=['.', '/'])
 async def info(msg: Message, *args):
     reply = await info_parser(bot, msg, *args)
     await msg.reply(reply)
 
 
-@bot.command(name='recent', aliases=['r'], prefixes=['.'])
+@bot.command(name='mode', aliases=['setmode'], prefixes=['.', '/'])
+async def mode(msg: Message, *args):
+    reply = mode_parser(msg, *args)
+    await msg.reply(reply)
+
+
+@bot.command(name='recent', aliases=['r'], prefixes=['.', '/'])
 async def recent(msg: Message, *args):
     reply, cache_dto = await recent_parser(bot, msg, *args, include_fail=True)
     reply_msg = await msg.reply(reply)
@@ -69,7 +75,7 @@ async def recent(msg: Message, *args):
         await add_reaction(bot, reply_msg.get('msg_id'), msg, me.id, cache_dto)
 
 
-@bot.command(name='precent', aliases=['p', 'pr'], prefixes=['.'])
+@bot.command(name='precent', aliases=['p', 'pr'], prefixes=['.', '/'])
 async def precent(msg: Message, *args):
     reply, cache_dto = await recent_parser(bot, msg, *args, include_fail=False)
     reply_msg = await msg.reply(reply)
@@ -78,19 +84,19 @@ async def precent(msg: Message, *args):
         await add_reaction(bot, reply_msg.get('msg_id'), msg, me.id, cache_dto)
 
 
-@bot.command(name='score', aliases=['s'], prefixes=['.'])
+@bot.command(name='score', aliases=['s'], prefixes=['.', '/'])
 async def score(msg: Message, *args):
     reply = await score_parser(bot, msg, *args)
     await msg.reply(reply)
 
 
-@bot.command(name='compare', aliases=['c'], prefixes=['.'])
+@bot.command(name='compare', aliases=['c'], prefixes=['.', '/'])
 async def compare(msg: Message):
     reply = await compare_parser(bot, msg)
     await msg.reply(reply)
 
 
-@bot.command(name='search', prefixes=['.'])
+@bot.command(name='search', prefixes=['.', '/'])
 async def search(msg: Message, *args):
     waiting = await msg.reply(search_waiting_card())
     waiting_msg, reply, func, *f_args = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)

@@ -1,6 +1,6 @@
 from khl import Bot
 
-from src.card import user_card
+from src.card import info_card
 from src.exception import OsuApiException
 from src.service import OsuApi, user_info_service
 from src.util.uploadAsset import download_and_upload
@@ -27,4 +27,4 @@ async def info_command(bot: Bot, osu_name: str, mode: str, day: int, user_id):
         if cover is not None:
             kwargs['cover'] = await download_and_upload(bot, cover)
 
-        return user_card(user_info, compare_user_info=compare_info, **kwargs)
+        return info_card(user_info, compare_user_info=compare_info, **kwargs)

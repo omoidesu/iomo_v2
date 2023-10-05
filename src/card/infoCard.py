@@ -8,7 +8,7 @@ from src.util import count_delta, time_format
 from ._modules import Modules
 
 
-def user_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
+def info_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
     mode = kwargs.get('mode')
     if not mode:
         mode = user_info.get('playmode')
@@ -28,7 +28,7 @@ def user_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
     user_level = 0 if user_level is None else user_level
     header.append(f"#{global_rank}" + (
         f"({count_delta(global_rank, compare_user_info.global_rank, rank=True)})" if compare_user_info else ''))
-    header.append(f'\tLv. {user_level.get("current")} ({user_level.get("progress")}%)')
+    header.append(f'Lv. {user_level.get("current")} ({user_level.get("progress")}%)')
     card.append(Module.Header('\t'.join(header)))
 
     context = [
