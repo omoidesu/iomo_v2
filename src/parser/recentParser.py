@@ -19,8 +19,12 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
 
     target_kook_id = 0
     ls_mode = False
-    if '-ls' in args or '-list' in args:
+    if '-ls' in args:
         ls_mode = True
+        osu_name = osu_name.replace('-ls', '')
+    if '-list' in args:
+        ls_mode = True
+        osu_name = osu_name.replace('-list', '')
 
     # 如果有@人则查询osu信息是被@人绑定的信息
     if len(msg.mention) > 0:

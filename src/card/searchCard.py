@@ -3,6 +3,7 @@ from khl.card import CardMessage, Element, Module, Types
 from src.const import Assets
 from src.dto import BeatmapSet
 from ._modules import Modules
+from src.util import kmarkdown_format
 
 
 def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, current: int, prev: bool = False,
@@ -12,8 +13,8 @@ def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, cur
     for beatmapset in beatmapsets:
         modules.append(Modules.divider)
         beatmapset_info = [
-            f'**{beatmapset.title_unicode if beatmapset.title_unicode else beatmapset.title}**',
-            f'*▸ artist: {beatmapset.artist_unicode if beatmapset.artist_unicode else beatmapset.artist}*',
+            f'**{kmarkdown_format(beatmapset.title_unicode) if beatmapset.title_unicode else kmarkdown_format(beatmapset.title)}**',
+            f'*▸ artist: {kmarkdown_format(beatmapset.artist_unicode) if beatmapset.artist_unicode else kmarkdown_format(beatmapset.artist)}*',
             f'*▸ set id: {beatmapset.id} ▸ 作者: {beatmapset.creator}*',
             f'*▸ (emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]收藏数: {beatmapset.favourite_count} '
             f'▸ (emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]游玩数: {beatmapset.play_count}*'

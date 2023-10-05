@@ -99,7 +99,7 @@ async def search(msg: Message, *args):
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)
-async def on_added_emoji(bot: Bot, e: Event):
+async def on_added_emoji(_: Bot, e: Event):
     msg_id = e.body.get('msg_id')
     user_id = e.body.get('user_id')
     emoji_id = e.body.get('emoji').get('id')
@@ -112,7 +112,13 @@ async def on_added_emoji(bot: Bot, e: Event):
                                                        'channel_id': channel_id})
 
 
+@bot.on_event(EventTypes.MESSAGE_BTN_CLICK)
+async def on_btn_click(b: Bot, event: Event):
+    ...
+
+
 def save_cardmsg(reply):
+    """卡片消息未通过验证时检查内容用"""
     import json
     import os
 

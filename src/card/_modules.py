@@ -2,7 +2,7 @@ from khl.card import Card, Element, Module, Struct, Types
 from khl.card.interface import _Module
 
 from src.const import Assets
-from src.util import convert_date, seconds_to_str
+from src.util import convert_date, seconds_to_str, kmarkdown_format
 
 
 class Modules:
@@ -69,12 +69,12 @@ class Modules:
 
         user = score_info.get('user')
 
-        source = beatmapset.get('source')
-        artist_unicode = beatmapset.get('artist_unicode').replace('*', '\\*')
-        title_unicode = beatmapset.get('title_unicode').replace('*', '\\*')
-        artist = beatmapset.get('artist').replace('*', '\\*')
-        title = beatmapset.get('title').replace('*', '\\*')
-        version = beatmap.get('version')
+        source = kmarkdown_format(beatmapset.get('source'))
+        artist_unicode = kmarkdown_format(beatmapset.get('artist_unicode'))
+        title_unicode = kmarkdown_format(beatmapset.get('title_unicode'))
+        artist = kmarkdown_format(beatmapset.get('artist'))
+        title = kmarkdown_format(beatmapset.get('title'))
+        version = kmarkdown_format(beatmap.get('version'))
 
         mods = score_info.get('mods', [])
         create_at = convert_date(score_info.get('created_at'))

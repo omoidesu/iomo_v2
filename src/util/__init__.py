@@ -103,3 +103,28 @@ def seconds_to_str(secs: int):
 def convert_date(date: str) -> str:
     iso_date = datetime.fromisoformat(date.replace('Z', '+00:00'))
     return (iso_date + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+
+
+def kmarkdown_format(str_sequence: str):
+    if str_sequence is None:
+        return None
+
+    str_sequence = str_sequence.strip()
+    return str_sequence.replace('*', '\\*').replace('"', '\\"').replace(
+        '~~', '\\~\\~').replace('---', '\\-\\-\\-').replace('`', '\\`')
+
+
+def beatmap_attributes_format(beatmap_id: int, cs: float, ar: float, od: float, hp: float):
+    beatmap_id = str(beatmap_id).ljust(7, ' ')
+
+    def format_float(value: float):
+        value = str(value)
+
+        if len(value) == 1:
+            value += '   '
+        elif len(value) == 2:
+            value += ' '
+
+        return value
+
+    return beatmap_id, format_float(cs), format_float(ar), format_float(od), format_float(hp)

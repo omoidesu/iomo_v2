@@ -2,6 +2,7 @@ from khl.card import Card, CardMessage, Element, Module, Types
 
 from src.const import Assets
 from ._modules import Modules
+from src.util import kmarkdown_format
 
 nums = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣')
 
@@ -22,8 +23,8 @@ def recent_card(recent_score: list, **kwargs):
     for score in recent_score:
         id_map[nums[recent_score.index(score)]] = score.get('id')
         beatmapset = score.get('beatmapset')
-        artist = beatmapset.get('artist_unicode').replace('*', '\\*')
-        title = beatmapset.get('title_unicode').replace('*', '\\*')
+        artist = kmarkdown_format(beatmapset.get('artist_unicode'))
+        title = kmarkdown_format(beatmapset.get('title_unicode'))
         pp = score.get('pp') if score.get('pp') is not None else 0
         difficulty_rating = score.get('beatmap', {}).get('difficulty_rating')
         difficulty_rating_str = f'{difficulty_rating:.2f}' if difficulty_rating is not None else '0.00'

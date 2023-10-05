@@ -49,7 +49,7 @@ class AssetService(__SqlService):
         super().__init__(1)
 
     def select_asset(self, source_url: str):
-        return self._session.query(OsuAsset).filter(OsuAsset.source_url == source_url).ordet_by(
+        return self._session.query(OsuAsset).filter(OsuAsset.source_url == source_url).order_by(
             OsuAsset.create_time).first()
 
     def select_asset_batch(self, **kwargs) -> dict:
