@@ -21,8 +21,11 @@ class Modules:
         return card
 
     @staticmethod
-    def download_module(beatmapset_id: int) -> _Module:
-        ppy = f'[osu!](https://osu.ppy.sh/beatmapsets/{beatmapset_id}/download)'
+    def download_module(beatmapset_id: int, download_disable: bool = False) -> _Module:
+        if download_disable:
+            ppy = f'~~[osu!](https://osu.ppy.sh/beatmapsets/{beatmapset_id})~~'
+        else:
+            ppy = f'[osu!](https://osu.ppy.sh/beatmapsets/{beatmapset_id})'
         sayo = f'[sayobot](https://dl.sayobot.cn/beatmaps/download/novideo/{beatmapset_id})'
         chimu = f'[chimu](https://api.chimu.moe/v1/download/{beatmapset_id}?n=1)'
         btct = f'[btct](https://beatconnect.io/b/{beatmapset_id})'

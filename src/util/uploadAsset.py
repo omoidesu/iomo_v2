@@ -12,7 +12,10 @@ from src.dao.models import OsuAsset, OsuStarAsset
 from src.service import asset_service, star_asset_service
 
 
-async def download_and_upload(bot: Bot, resource: str, force: bool = False):
+async def download_and_upload(bot: Bot, resource: str, force: bool = False, origin: bool = False):
+    if origin:
+        return resource
+
     if not force:
         asset = asset_service.select_asset(resource)
         if asset is not None:

@@ -128,3 +128,17 @@ def beatmap_attributes_format(beatmap_id: int, cs: float, ar: float, od: float, 
         return value
 
     return beatmap_id, format_float(cs), format_float(ar), format_float(od), format_float(hp)
+
+
+def difficult_format(difficult: float):
+    difficult = str(difficult)
+    if len(difficult) == 1:
+        difficult += '        '
+    elif len(difficult) == 3:
+        difficult += '     '
+    elif len(difficult) == 4:
+        difficult += '   '
+    elif len(difficult) == 5:
+        difficult += ' '
+
+    return difficult

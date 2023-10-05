@@ -1,3 +1,4 @@
+from .mapInfoCard import beatmap_set_card
 from .recentCard import recent_card
 from .scoreCard import score_card
 from .searchCard import search_card

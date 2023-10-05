@@ -94,8 +94,10 @@ async def compare(msg: Message):
 async def search(msg: Message, *args):
     waiting = await msg.reply(search_waiting_card())
     reply, emojis, waiting_msg = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
+    save_cardmsg(reply)
     await update_to_card(bot, waiting_msg, reply)
-    await delete_emojis(emoji_guild, emojis)
+    if emojis:
+        await delete_emojis(emoji_guild, emojis)
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)
