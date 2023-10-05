@@ -2,8 +2,8 @@ from khl import Bot, Event, EventTypes, Guild, Message, User
 
 from src.card import search_waiting_card
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
-from src.parser import (bind_parser, compare_parser, info_parser, ping_parser, reaction_parser, recent_parser,
-                        score_parser, search_parser, unbind_parser)
+from src.parser import (bind_parser, button_queue, compare_parser, info_parser, ping_parser, reaction_queue,
+                        recent_parser, score_parser, search_parser, unbind_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -30,6 +30,7 @@ async def ping(msg: Message, *args):
 @bot.command(name='clear')
 async def clear_emoji(msg: Message):
     if msg.author.id in admin_id:
+        await msg.reply(f'开始清理社区{emoji_guild.name}的所有表情')
         emoji_list = await emoji_guild.fetch_emoji_list()
         for emoji in emoji_list:
             await emoji_guild.delete_emoji(emoji)
@@ -110,13 +111,14 @@ async def on_added_emoji(_: Bot, e: Event):
     if user_id == me.id:
         return
 
-    await reaction_parser.insert_reaction(bot, me.id, {'msg_id': msg_id, 'user_id': user_id, 'emoji_id': emoji_id,
-                                                       'channel_id': channel_id})
+    await reaction_queue.insert_reaction(bot, me.id, {'msg_id': msg_id, 'user_id': user_id, 'emoji_id': emoji_id,
+                                                      'channel_id': channel_id})
 
 
 @bot.on_event(EventTypes.MESSAGE_BTN_CLICK)
-async def on_btn_click(b: Bot, event: Event):
-    ...
+async def on_btn_click(b: Bot, e: Event):
+    body = e.body
+    await button_queue.insert_button(bot, me.id, body, emoji_guild)
 
 
 def save_cardmsg(reply):

@@ -33,4 +33,4 @@ async def search_parser(bot: Bot, msg: Message, guild: Guild, reply_msg_id: str,
             artist, title = '', keyword
 
     card_msg, emojis = await search_command(bot, keyword, artist, title, source, guild)
-    return reply_msg, card_msg, delete_emojis, emojis
+    return reply_msg, card_msg, delete_emojis, guild, emojis

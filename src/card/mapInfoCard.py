@@ -5,7 +5,7 @@ from src.util import difficult_format, kmarkdown_format
 from ._modules import Modules
 
 
-def beatmap_set_card(beatmap_set: dict, beatmap_id: int = 0, **kwargs):
+def beatmap_set_card(beatmap_set: dict, beatmap_id: int, **kwargs):
     beatmaps = beatmap_set.get('beatmaps')
     beatmaps = sorted(beatmaps, key=lambda x: x.get('difficulty_rating'))
     osu, taiko, fruits, mania = [], [], [], []
@@ -34,7 +34,7 @@ def beatmap_set_card(beatmap_set: dict, beatmap_id: int = 0, **kwargs):
     header = Module.Section(
         Element.Text(f'**{Assets.Sticker.STATUS.get(beatmap_set.get("status"))}  {head}**'))
 
-    info = Module.Context(Element.Image(user.get('avatar_url')))
+    info = Module.Context(Element.Image(kwargs.get('avatar')))
     info.append(Element.Text(
         f' [{user.get("username")}](https://osu.ppy.sh/users/{user.get("id")}) | {artist} - {title} | set id: {beatmap_set.get("id")} |'))
     struct_content = [
@@ -67,14 +67,13 @@ def beatmap_set_card(beatmap_set: dict, beatmap_id: int = 0, **kwargs):
             beatmap_info.append(Element.Image(Assets.Image.STATUS.get(beatmap.get('status'))))
             beatmap_info.append(
                 Element.Text(
-                    f'▸ id: {str(beatmap.get("id")).ljust(7, " ")} ▸ ★{difficult_format(diff)} ▸ 难度名: {beatmap.get("version")}'))
+                    f'▸ id: {str(beatmap.get("id")).ljust(8, " ")} ▸ ★{difficult_format(diff)} ▸ 难度名: {beatmap.get("version")}'))
 
         beatmap_infos.append(beatmap_info)
 
     download_module = Modules.download_module(beatmap_set)
 
-    music_module = Modules.music_module('https:' + beatmap_set.get('preview_url'), title_unicode,
-                                        kwargs.get('cover_list'))
+    music_module = Modules.music_module(kwargs.get('preview'), title_unicode, kwargs.get('cover_list'))
 
     return CardMessage(Modules.card(header, info, genre, tags, Modules.divider, banner, Modules.divider, *beatmap_infos,
                                     Modules.divider, download_module, music_module, color='#33AAFF'))

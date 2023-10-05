@@ -64,6 +64,8 @@ class AssetService(__SqlService):
         for key in kwargs.keys():
             if assets_map.get(kwargs[key]):
                 result[key] = assets_map.get(kwargs[key])
+            else:
+                result[key] = None
 
         return result
 

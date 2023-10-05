@@ -59,15 +59,21 @@ class RecentListCacheDTO:
 
 class SearchListCacheDTO:
     _keyword: str
+    _source: str
     _pages: list[list[BeatmapSet]]
 
-    def __init__(self, keyword: str, pages: list[list[BeatmapSet]]):
+    def __init__(self, keyword: str, source: str, pages: list[list[BeatmapSet]]):
         self._keyword = keyword
+        self._source = source
         self._pages = pages
 
     @property
     def keyword(self):
         return self._keyword
+
+    @property
+    def source(self):
+        return self._source
 
     @property
     def pages(self):

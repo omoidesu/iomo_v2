@@ -9,14 +9,14 @@ from src.dto import RecentListCacheDTO
 from src.util import construct_message_obj
 
 
-class ReactionParser:
-    _instance: 'ReactionParser' = None
+class ReactionQueue:
+    _instance: 'ReactionQueue' = None
     _reaction_queue: deque = deque()
     _is_running = False
     _redis = Redis.instance().get_connection()
 
     @classmethod
-    def instance(cls) -> 'ReactionParser':
+    def instance(cls) -> 'ReactionQueue':
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance

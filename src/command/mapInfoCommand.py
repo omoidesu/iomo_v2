@@ -6,7 +6,7 @@ from src.service import OsuApi
 from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
 
 
-async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = 0):
+async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = None):
     api = OsuApi()
     kwargs = {}
 
@@ -23,6 +23,16 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = 0)
         mode = beatmap.get('mode')
         diff = beatmap.get('difficulty_rating')
         kwargs[f'{mode}{diff}'] = await generate_diff_png_and_upload(bot, mode, diff)
+
+    preview = beatmapset.get('preview_url')
+    if preview:
+        kwargs['preview'] = await download_and_upload(bot, 'https:' + preview)
+
+    avatar = beatmapset.get('user', {}).get('avatar_url')
+    if avatar:
+        kwargs['avatar'] = await download_and_upload(bot, avatar)
+    else:
+        kwargs['avatar'] = Assets.Image.DEFAULT_AVATAR
 
     return beatmap_set_card(beatmapset, beatmap_id, **kwargs)
 

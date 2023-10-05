@@ -83,7 +83,7 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: 
     bytes_io = io.BytesIO()
     sm.save(bytes_io, format='png')
     if emoji:
-        return await guild.create_emoji(emoji=io.BytesIO(bytes_io.getvalue()), name=str(diff))
+        return await guild.create_emoji(emoji=io.BytesIO(bytes_io.getvalue()), name=f'{mode}{diff}'.replace('.', ''))
 
     kook_url = await bot.client.create_asset(io.BytesIO(bytes_io.getvalue()))
 

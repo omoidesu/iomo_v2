@@ -6,9 +6,10 @@ from src.util import kmarkdown_format
 from ._modules import Modules
 
 
-def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, current: int, prev: bool = False,
+def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, current: int, total_page: int,
+                prev: bool = False,
                 next: bool = False, **kwargs):
-    modules = [Module.Header(f'{keyword} 的搜索结果')]
+    modules = [Module.Header(f'{keyword} 的搜索结果 ({current + 1}/{total_page})')]
 
     for beatmapset in beatmapsets:
         modules.append(Modules.divider)
@@ -27,11 +28,22 @@ def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, cur
                                       mode=Types.SectionMode.RIGHT))
 
         stickers = f'{Assets.Sticker.STATUS.get(beatmapset.status)} | '
+
         for beatmap in beatmapset.beatmaps:
             key = f'{beatmap.mode}{beatmap.difficulty_rating}'
-            stickers += f'{kwargs.get(key)}'
-        modules.append(Module.Section(Element.Text(stickers), accessory=Element.Button('详情', f'set:{beatmapset.id}',
-                                                                                       theme=Types.Theme.PRIMARY)))
+            sticker = kwargs.get(key)
+            if sticker is None:
+                continue
+            stickers += f'{sticker}'
+
+        beatmaps_count = len(beatmapset.beatmaps)
+        if beatmaps_count > 15:
+            stickers += f'*+{beatmaps_count - 14}*'
+
+        modules.append(
+            Module.Section(Element.Text(stickers),
+                           accessory=Element.Button('详情', f'search:{search_id}:set:{beatmapset.id}',
+                                                    theme=Types.Theme.PRIMARY)))
 
     if not prev and not next:
         return CardMessage(Modules.card(*modules, color='#367FA3'))
@@ -40,13 +52,13 @@ def search_card(keyword: str, beatmapsets: list[BeatmapSet], search_id: int, cur
     actions = Module.ActionGroup()
 
     if prev:
-        prev_btn = Element.Button('上一页', f'search:{search_id}:{current - 1}', theme=Types.Theme.INFO)
+        prev_btn = Element.Button('上一页', f'search:{search_id}:page:{current - 1}', theme=Types.Theme.INFO)
     else:
         prev_btn = Element.Button(' ', '', theme=Types.Theme.SECONDARY)
     actions.append(prev_btn)
 
     if next:
-        next_btn = Element.Button('下一页', f'search:{search_id}:{current + 1}', theme=Types.Theme.INFO)
+        next_btn = Element.Button('下一页', f'search:{search_id}:page:{current + 1}', theme=Types.Theme.INFO)
     else:
         next_btn = Element.Button(' ', '', theme=Types.Theme.SECONDARY)
     actions.append(next_btn)
