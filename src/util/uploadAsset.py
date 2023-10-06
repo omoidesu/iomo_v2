@@ -5,6 +5,7 @@ import aiohttp
 from PIL import Image
 from aiohttp import TCPConnector
 from khl import Bot, Guild
+from meme_generator import get_meme
 
 from src.asset import get_assets
 from src.const import Assets
@@ -88,4 +89,20 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: 
     kook_url = await bot.client.create_asset(io.BytesIO(bytes_io.getvalue()))
 
     star_asset_service.insert(OsuStarAsset(mode=mode, star=stars, asset=kook_url))
+    return kook_url
+
+
+async def good_news_generator(bot: Bot, msg: str):
+    asset = asset_service.select_asset(msg)
+    if asset:
+        return asset.oss_url
+
+    meme = get_meme('good_news')
+    img: io.BytesIO = await meme(texts=[msg])
+
+    kook_url = await bot.client.create_asset(img.getvalue())
+
+    new_asset = OsuAsset(source_url=msg, oss_url=kook_url)
+    asset_service.insert(new_asset)
+
     return kook_url

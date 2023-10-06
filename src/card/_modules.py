@@ -2,7 +2,7 @@ from khl.card import Card, Element, Module, Struct, Types
 from khl.card.interface import _Module
 
 from src.const import Assets
-from src.util import convert_date, seconds_to_str, kmarkdown_format
+from src.util import convert_date, kmarkdown_format, seconds_to_str
 
 
 class Modules:
@@ -164,3 +164,15 @@ class Modules:
                 elements.append(Element.Text(f' ***SS***   : {pp if pp is not None else "-"} pp', type=Types.Text.KMD))
 
         return Module.Section(Struct.Paragraph(3, *elements))
+
+    @staticmethod
+    def good_news_card(src: str, header: str = None) -> list[_Module]:
+        modules = []
+
+        if header:
+            modules.append(Module.Section(Element.Text(header)))
+
+        modules.append(Modules.divider)
+        modules.append(Modules.banner(src))
+
+        return modules

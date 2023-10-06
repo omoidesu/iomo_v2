@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from khl import Bot
 
-from src.card import bp_card
+from src.card import bp_card, no_bp_card
 from src.const import Assets
 from src.exception import OsuApiException
 from src.service import OsuApi
-from src.util.uploadAsset import download_and_upload
+from src.util.uploadAsset import download_and_upload, good_news_generator
 
 
 async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list):
@@ -57,3 +59,42 @@ async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list)
             kwargs[f"combo{bp.get('id')}"] = beatmap_info.get('max_combo')
 
         return bp_card(bp_info, **kwargs)
+
+
+async def bp_today_command(bot: Bot, osu_name: str, mode: str):
+    api = OsuApi()
+
+    if not str(osu_name).isdigit():
+        osu_info = await api.get_user(osu_name)
+        osu_name = osu_info.get('id')
+        if mode == '':
+            mode = osu_info.get('playmode')
+
+    kwargs = {}
+
+    try:
+        user_bp = await api.get_best_score(osu_name, mode=mode, limit=100)
+    except OsuApiException as e:
+        return e.do_except('该用户不存在')
+    else:
+        if len(user_bp) == 0:
+            return '该用户没有bp记录'
+
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_bps = list(filter(lambda x: x.get('created_at').startswith(today), user_bp))
+
+        if len(today_bps) == 0:
+            username = user_bp[0].get("user").get("username")
+            good_news = await good_news_generator(bot, f'{username}今天没有新bp')
+            return no_bp_card(username, mode, good_news)
+
+        for bp in today_bps:
+            beatmapset = bp.get('beatmapset')
+            cover = beatmapset.get('covers', {}).get('list')
+            kwargs[f"cover{bp.get('id')}"] = await download_and_upload(bot,
+                                                                       cover) if cover else Assets.Image.OSU_LOGO
+            beatmap = bp.get('beatmap')
+            beatmap_info = await api.get_beatmap_info(beatmap.get('id'))
+            kwargs[f"combo{bp.get('id')}"] = beatmap_info.get('max_combo')
+
+        return bp_card(today_bps, **kwargs)

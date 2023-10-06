@@ -5,7 +5,7 @@ from src.util import convert_date
 from ._modules import Modules
 
 
-def bp_card(bp_list: dict, **kwargs):
+def bp_card(bp_list: list, **kwargs):
     bp = bp_list[0]
     username = bp.get('user', {}).get('username')
     mode = bp.get('mode')
@@ -52,3 +52,10 @@ def bp_card(bp_list: dict, **kwargs):
         bp_modules.append(download)
 
     return CardMessage(Modules.card(header, *bp_modules, color=Assets.COLOR.get(mode)))
+
+
+def no_bp_card(username: str, mode: str, src: str):
+    card_modules = Modules.good_news_card(src,
+                                          header=f'{Assets.Sticker.MODE.get(mode)} **{username}的Best Performance记录**')
+
+    return CardMessage(Modules.card(*card_modules, color=Assets.COLOR.get(mode)))

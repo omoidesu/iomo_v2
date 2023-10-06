@@ -1,4 +1,4 @@
-from .bpCommand import bp_command
+from .bpCommand import bp_command, bp_today_command
 from .infoCommand import info_command
 from .mapInfoCommand import beatmap_command, beatmap_set_command
 from .recationCallback import reaction_callback
