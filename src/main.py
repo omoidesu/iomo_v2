@@ -1,9 +1,13 @@
+import re
+
 from khl import Bot, Event, EventTypes, Guild, Message, User
 
 from src.card import search_waiting_card
+from src.command import beatmap_set_command
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
-from src.parser import (bind_parser, bp_parser, button_queue, compare_parser, info_parser, mode_parser, ping_parser,
-                        reaction_queue, recent_parser, score_parser, search_parser, unbind_parser, bp_today_parser)
+from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, info_parser, mode_parser,
+                        osu_homepage_parser, ping_parser, reaction_queue, recent_parser, score_parser, search_parser,
+                        unbind_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -62,7 +66,7 @@ async def info(msg: Message, *args):
 
 @bot.command(name='mode', aliases=['setmode'], prefixes=['.', '/'])
 async def mode(msg: Message, *args):
-    reply = mode_parser(msg, *args)
+    reply = await mode_parser(msg, *args)
     await msg.reply(reply)
 
 
@@ -117,6 +121,23 @@ async def bp(msg: Message, *args):
 async def bptoday(msg: Message, *args):
     reply = await bp_today_parser(bot, msg, *args)
     await msg.reply(reply)
+
+
+@bot.command(regex=r'.+https://osu\.ppy\.sh/beatmapsets/\d+.+', prefixes=[])
+async def beatmap_link(msg: Message):
+    args = re.findall(r'https://osu\.ppy\.sh/beatmapsets/(\d+)(#(mania|osu|taiko|fruits)/(\d+))?', msg.content)[0]
+    set_id = int(args[0])
+    map_id = int(args[3]) if args[3] else None
+    reply = await beatmap_set_command(bot, set_id, map_id)
+    await msg.ctx.channel.send(reply)
+
+
+@bot.command(regex=r'.+https://osu.ppy.sh/users/\d+.+', prefixes=[])
+async def user_link(msg: Message):
+    reply, id_map = await osu_homepage_parser(bot, msg)
+    await msg.reply(reply)
+    if id_map is not None:
+        await collect_user_info(**id_map)
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)

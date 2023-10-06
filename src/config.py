@@ -19,10 +19,18 @@ bot_token = ''
 client_id = 0
 client_secret = ""
 
+# admin
+admin_id = ('',)
+
 # playing status
 playing_game_id = 5883  # osu!
 
 # emoji guild
-emoji_guild = ""
+emoji_guild = ''
 
-admin_id = ('',)
+# channel for user's osu homepage url, when catch osu homepage url will register automatically
+user_channel = ('',)
+
+# osu guild
+osu_guild = ''
+osu_guild_role = {'osu': 197862, 'taiko': 197869, 'fruits': 197870, 'mania': 197865}

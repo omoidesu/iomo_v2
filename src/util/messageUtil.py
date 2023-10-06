@@ -1,7 +1,4 @@
-import json
-
-from khl import Bot, Message, PublicMessage
-from khl.card import CardMessage
+from khl import Bot, PublicMessage
 
 
 def construct_message_obj(bot: Bot, msg_id: str, channel_id: str, guild_id: str, user_id: str):
@@ -18,4 +15,3 @@ def construct_message_obj(bot: Bot, msg_id: str, channel_id: str, guild_id: str,
             }
         }
     )
-

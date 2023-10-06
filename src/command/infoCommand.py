@@ -6,7 +6,7 @@ from src.service import OsuApi, user_info_service
 from src.util.uploadAsset import download_and_upload
 
 
-async def info_command(bot: Bot, osu_name: str, mode: str, day: int, user_id):
+async def info_command(bot: Bot, osu_name: str, mode: str = '', day: int = 1, user_id: int = 0):
     api = OsuApi()
 
     try:
