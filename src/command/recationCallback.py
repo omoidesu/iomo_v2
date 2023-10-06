@@ -22,6 +22,7 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
 
     score = target_score[0]
 
+    beatmap = score.get('beatmap', {})
     beatmap_set = score.get('beatmapset', {})
     kwargs = {}
     # 封面
@@ -63,4 +64,4 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
     redis_key = redis_recent_beatmap.format(guild_id=dto.guild_id, channel_id=channel_id)
     redis_connector.set(redis_key, score.get('beatmap', {}).get('id'))
 
-    return score_card(score, **kwargs)
+    return score_card(score, beatmap, beatmap_set, **kwargs)
