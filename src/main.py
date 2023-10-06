@@ -2,8 +2,8 @@ from khl import Bot, Event, EventTypes, Guild, Message, User
 
 from src.card import search_waiting_card
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
-from src.parser import (bind_parser, button_queue, compare_parser, info_parser, ping_parser, reaction_queue,
-                        recent_parser, score_parser, search_parser, unbind_parser, mode_parser)
+from src.parser import (bind_parser, bp_parser, button_queue, compare_parser, info_parser, mode_parser, ping_parser,
+                        reaction_queue, recent_parser, score_parser, search_parser, unbind_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -105,6 +105,12 @@ async def search(msg: Message, *args):
         after = await func(*f_args)
         if after:
             await waiting_msg.update(after)
+
+
+@bot.command(name='bp', prefixes=['.', '/'])
+async def bp(msg: Message, *args):
+    reply = await bp_parser(bot, msg, *args)
+    await msg.reply(reply)
 
 
 @bot.on_event(EventTypes.ADDED_REACTION)

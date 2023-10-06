@@ -6,7 +6,7 @@ from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
 from src.exception import OsuApiException
-from src.service import OsuApi, SayoApi, beatmap_set_service
+from src.service import OsuApi, beatmap_set_service
 from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
 
 redis = Redis.instance().get_connection()
@@ -33,16 +33,10 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
 
         # 如果输入是NM则只查找没有mod的记录
         if len(mod) == 1 and mod[0] == 'NM':
-            for i in range(len(recent_score) - 1, -1, -1):
-                game_play = recent_score[i]
-                if game_play.get('mods', []):
-                    recent_score.pop(i)
+            recent_score = filter(lambda x: x.get('mods') == [], recent_score)
         # 如果输入的mod不是NM则查找mod包含于输入mod的记录
         elif len(mod) > 0:
-            for i in range(len(recent_score) - 1, -1, -1):
-                game_play = recent_score[i]
-                if not set(mod).issubset(game_play.get('mods', [])):
-                    recent_score.pop(i)
+            recent_score = filter(lambda x: set(mod).issubset(x.get('mods', [])), recent_score)
 
         kwargs = {'mode': mode}
 

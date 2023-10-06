@@ -7,6 +7,7 @@ from src.exception import OsuApiException
 from src.service import OsuApi, user_service
 from src.util.log import save_log
 from src.util.uploadAsset import download_and_upload
+from .bpParser import bp_parser
 from .buttonQueue import ButtonQueue
 from .compareParser import compare_parser
 from .infoParser import info_parser
