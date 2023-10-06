@@ -6,8 +6,8 @@ from src.card import search_waiting_card
 from src.command import beatmap_set_command
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, info_parser, mode_parser,
-                        osu_homepage_parser, ping_parser, reaction_queue, recent_parser, score_parser, search_parser,
-                        unbind_parser)
+                        osu_homepage_parser, ping_parser, ranking_parser, reaction_queue, recent_parser, score_parser,
+                        search_parser, unbind_parser)
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -120,6 +120,12 @@ async def bp(msg: Message, *args):
 @bot.command(name='bptoday', aliases=['bpme'], prefixes=['.', '/'])
 async def bptoday(msg: Message, *args):
     reply = await bp_today_parser(bot, msg, *args)
+    await msg.reply(reply)
+
+
+@bot.command(name='rank', prefixes=['.', '/'])
+async def rank(msg: Message, *args):
+    reply = await ranking_parser(msg, *args)
     await msg.reply(reply)
 
 
