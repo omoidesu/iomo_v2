@@ -23,7 +23,7 @@ def bp_card(bp_list: list, **kwargs):
         context.append(Element.Image(Assets.Image.RANK.get(bp_info.get('rank'))))
         context.append(
             Element.Text(
-                f'| **(font){bp_info.get("pp")} pp → {pp_with_percent} pp ({round(percent, 2)}%)(font)[none]**'))
+                f'| **(font){round(bp_info.get("pp"), 2)} pp → {pp_with_percent} pp ({round(percent, 2)}%)(font)[none]**'))
 
         mods = bp_info.get('mods')
         if mods:
