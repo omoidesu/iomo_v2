@@ -19,7 +19,7 @@ async def bind_parser(bot: Bot, msg: Message, *args):
 
     username = ' '.join(args)
 
-    return bind_command(bot, kook_id, username)
+    return await bind_command(bot, kook_id, username)
 
 
 async def unbind_parser(msg: Message, *args):
