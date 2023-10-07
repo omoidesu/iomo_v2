@@ -65,7 +65,8 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
 
                 cover = beatmap_set.get('covers', {}).get('list')
                 if cover:
-                    tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, f"{beatmap_set.get('id')}")))
+                    tasks.append(asyncio.create_task(
+                        upload_asset(bot, cover, kwargs, f"{beatmap_set.get('id')}", Assets.Image.DEFAULT_COVER)))
                 else:
                     kwargs[f"{beatmap_set.get('id')}"] = Assets.Image.OSU_LOGO
 
@@ -95,11 +96,12 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         # 封面
         cover: str = beatmap_set.get('covers', {}).get('list')
         if cover is not None:
-            tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+            tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
         # 试听
         if beatmap_set.get('preview_url') is not None:
             tasks.append(
-                asyncio.create_task(upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview')))
+                asyncio.create_task(upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview',
+                                                 Assets.Audio.WELCOME)))
 
         difficult = beatmap.get('difficulty_rating')
         tasks.append(asyncio.create_task(generate_stars(bot, mode, difficult, kwargs, 'star')))

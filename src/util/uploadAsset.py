@@ -10,6 +10,7 @@ from meme_generator import get_meme
 from src.asset import get_assets
 from src.const import Assets
 from src.dao.models import OsuAsset, OsuStarAsset
+from src.exception import NetException
 from src.service import asset_service, star_asset_service
 
 
@@ -32,6 +33,8 @@ async def download_and_upload(bot: Bot, resource: str, force: bool = False, orig
                 asset_service.insert(new_asset)
 
                 return kook_url
+            else:
+                raise NetException(resp.status)
 
 
 async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: bool = False, guild: Guild = None):
@@ -108,8 +111,11 @@ async def good_news_generator(bot: Bot, msg: str):
     return kook_url
 
 
-async def upload_asset(bot: Bot, url: str, to: dict, key: str, force: bool = False, origin: bool = False):
-    to[key] = await download_and_upload(bot, url, force, origin)
+async def upload_asset(bot: Bot, url: str, to: dict, key: str, default: str, force: bool = False, origin: bool = False):
+    try:
+        to[key] = await download_and_upload(bot, url, force, origin)
+    except NetException:
+        to[key] = default
 
 
 async def generate_stars(bot: Bot, mode: str, stars: float, to: dict, key: str, emoji: bool = False,

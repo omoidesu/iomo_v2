@@ -31,9 +31,8 @@ class Modules:
         sayo = f'[sayobot](https://dl.sayobot.cn/beatmaps/download/novideo/{beatmapset_id})'
         chimu = f'[chimu](https://api.chimu.moe/v1/download/{beatmapset_id}?n=1)'
         btct = f'[btct](https://beatconnect.io/b/{beatmapset_id})'
-        nerina = f'[nerina](https://nerina.pw/d/{beatmapset_id})'
 
-        text = f'下载地址：{ppy} | {sayo} | {chimu} | {btct} | {nerina}'
+        text = f'下载地址：{ppy} | {sayo} | {chimu} | {btct}'
 
         return Module.Context(text)
 

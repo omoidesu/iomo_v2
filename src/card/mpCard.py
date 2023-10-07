@@ -40,14 +40,14 @@ def mp_card(game: dict, users: dict, scores: list, **kwargs):
     for score in scores:
         user_id = score.get('user_id')
         user = users.get(user_id)
-        section_text = f'> {user.username} {user.flag}\t\t{Assets.Sticker.RANK.get(score.get("rank"))}\t'
+        section_text = f'> {user.username} {user.flag}\t'
         mods = score.get('mods')
         for mod in mods:
             section_text += f'{Assets.Sticker.MOD.get(mod)}'
 
         section_text += f'\n{format(score.get("score"))}\t\t{score.get("max_combo")}x\t\t{round(score.get("accuracy") * 100, 2)}%'
         section = Module.Section(Element.Text(section_text),
-                                 accessory=Element.Image(kwargs.get(f'avatar{user.get("id")}'), circle=True,
+                                 accessory=Element.Image(kwargs.get(f'avatar{user.id}'), circle=True,
                                                          size=Types.Size.SM),
                                  mode=Types.SectionMode.LEFT)
         modules.append(section)

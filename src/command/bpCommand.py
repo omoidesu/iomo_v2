@@ -92,7 +92,8 @@ async def __bp_traverse(bot: Bot, bp_list: list, to: dict, api: OsuApi):
     for bp in bp_list:
         cover = bp.get('beatmapset').get('covers', {}).get('list')
         if cover:
-            tasks.append(asyncio.create_task(upload_asset(bot, cover, to, f"cover{bp.get('id')}")))
+            tasks.append(
+                asyncio.create_task(upload_asset(bot, cover, to, f"cover{bp.get('id')}", Assets.Image.DEFAULT_COVER)))
         else:
             to[f"cover{bp.get('id')}"] = Assets.Image.OSU_LOGO
         tasks.append(asyncio.create_task(__get_max_combo(api, bp.get('beatmap').get('id'), to, f"combo{bp.get('id')}")))

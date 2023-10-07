@@ -178,6 +178,9 @@ async def redis_event_handler():
     await redis_schedule(bot)
 
 
+# @bot.task.add_cron()
+
+
 def save_cardmsg(reply):
     """卡片消息未通过验证时检查内容用"""
     import json

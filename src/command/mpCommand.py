@@ -103,7 +103,8 @@ class MultiPlayCommand:
 
                     cover = game.get('beatmap', {}).get('beatmapset', {}).get('covers', {}).get('cover')
                     if cover:
-                        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+                        tasks.append(
+                            asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
                     else:
                         kwargs['cover'] = Assets.Image.DEFAULT_COVER
 
@@ -151,11 +152,13 @@ class MultiPlayCommand:
 
         bot.task.scheduler.remove_job(target_room.job_id)
         self._rooms.pop(target_room.match_id)
+        self._redis.delete(redis_mp_room.format(target_room.match_id))
         return f'已停止监听房间{target_room.match_name}'
 
     def remove_all(self, bot: Bot):
         for room in self._rooms.values():
             bot.task.scheduler.remove_job(room.job_id)
+            self._redis.delete(redis_mp_room.format(room.match_id))
         self._rooms.clear()
         return '已停止所有监听'
 

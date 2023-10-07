@@ -80,7 +80,8 @@ async def upload_assets_and_generate_search_card(bot: Bot, guild: Guild, source:
             kwargs[f'cover{beatmapset_id}'] = url
         else:
             tasks.append(
-                asyncio.create_task(upload_asset(bot, cover_url.get(beatmapset_id), kwargs, f'cover{beatmapset_id}')))
+                asyncio.create_task(upload_asset(bot, cover_url.get(beatmapset_id), kwargs, f'cover{beatmapset_id}',
+                                                 Assets.Image.DEFAULT_COVER)))
 
     await asyncio.wait(tasks)
     return search_card(keyword, beatmapsets, search_id, current_page, total_page, prev=has_prev, next=has_next,

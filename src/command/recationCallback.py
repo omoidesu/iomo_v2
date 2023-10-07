@@ -31,13 +31,13 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
     # 封面
     cover: str = beatmap_set.get('covers', {}).get('list')
     if cover:
-        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
     else:
         kwargs['cover'] = Assets.Image.DEFAULT_COVER
     # 试听
     preview = 'https:' + beatmap_set.get('preview_url')
     if preview is not None:
-        tasks.append(asyncio.create_task(upload_asset(bot, preview, kwargs, 'preview')))
+        tasks.append(asyncio.create_task(upload_asset(bot, preview, kwargs, 'preview', Assets.Audio.WELCOME)))
 
     difficult = score.get('beatmap', {}).get('difficulty_rating')
     tasks.append(asyncio.create_task(generate_stars(bot, dto.osu_mode, difficult, kwargs, 'star')))

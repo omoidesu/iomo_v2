@@ -110,13 +110,14 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
 
     cover: str = beatmap_set.get('covers', {}).get('list')
     if cover:
-        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
     else:
         kwargs['cover'] = Assets.Image.OSU_LOGO
     # 试听
     if beatmap_set.get('preview_url'):
         tasks.append(
-            asyncio.create_task(upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview')))
+            asyncio.create_task(
+                upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview', Assets.Audio.WELCOME)))
 
     difficult = beatmap.get('difficulty_rating')
     tasks.append(

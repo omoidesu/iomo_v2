@@ -16,8 +16,8 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = No
     beatmapset = await api.get_beatmapset_info(beatmapset_id)
     covers = beatmapset.get('covers', {})
     if covers:
-        tasks.append(upload_asset(bot, covers.get('cover'), kwargs, 'cover'))
-        tasks.append(upload_asset(bot, covers.get('list'), kwargs, 'cover_list'))
+        tasks.append(upload_asset(bot, covers.get('cover'), kwargs, 'cover', Assets.Image.DEFAULT_COVER))
+        tasks.append(upload_asset(bot, covers.get('list'), kwargs, 'cover_list', Assets.Image.OSU_LOGO))
     else:
         kwargs['cover'] = Assets.Image.DEFAULT_COVER
         kwargs['cover_list'] = Assets.Image.OSU_LOGO
@@ -29,11 +29,11 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = No
 
     preview = beatmapset.get('preview_url')
     if preview:
-        tasks.append(upload_asset(bot, 'https:' + preview, kwargs, 'preview'))
+        tasks.append(upload_asset(bot, 'https:' + preview, kwargs, 'preview', Assets.Audio.WELCOME))
 
     avatar = beatmapset.get('user', {}).get('avatar_url')
     if avatar:
-        tasks.append(upload_asset(bot, avatar, kwargs, 'avatar'))
+        tasks.append(upload_asset(bot, avatar, kwargs, 'avatar', Assets.Image.DEFAULT_AVATAR))
     else:
         kwargs['avatar'] = Assets.Image.DEFAULT_AVATAR
 
@@ -49,7 +49,7 @@ async def beatmap_command(bot: Bot, beatmap_id: int):
     beatmap = await api.get_beatmap_info(beatmap_id)
     cover = beatmap.get('beatmapset', {}).get('covers', {}).get('list')
     if cover:
-        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
     else:
         kwargs['cover'] = Assets.Image.OSU_LOGO
 

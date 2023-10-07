@@ -258,9 +258,10 @@ class Assets:
                 'count_300': '(emj)osu_300(emj)[8462491027363735/RFCyQ9F2Br05q03c]',
                 'count_100': '(emj)osu_100(emj)[8462491027363735/lNVVxabQ5r05e036]',
                 'count_50': '(emj)osu_50(emj)[8462491027363735/Kf1273LpyI03y036]',
-                'count_miss': '(emj)osu_miss(emj)[8462491027363735/fs3hty0W2b03m03m]',
                 'count_geki': '(emj)osu_geki(emj)[8462491027363735/CVsCY4rjcp04i04k]',
-                'count_katu': '(emj)osu_katu(emj)[8462491027363735/diU6rW35Yl03e03g]'
+                'count_katu': '(emj)osu_katu(emj)[8462491027363735/diU6rW35Yl03e03g]',
+                'count_miss': '(emj)osu_miss(emj)[8462491027363735/fs3hty0W2b03m03m]'
+
             },
 
             'taiko': {
@@ -285,3 +286,6 @@ class Assets:
                 'count_miss': '(emj)mania_miss(emj)[8462491027363735/KPYhAwmthM0a205i]',
             }
         }
+
+    class Audio:
+        WELCOME = 'https://img.kookapp.cn/attachments/2023-10/07/652178e1b3d80.mp3'
