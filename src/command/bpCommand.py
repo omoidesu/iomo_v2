@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 
 from khl import Bot
@@ -6,7 +7,7 @@ from src.card import bp_card, no_bp_card
 from src.const import Assets
 from src.exception import OsuApiException
 from src.service import OsuApi
-from src.util.uploadAsset import download_and_upload, good_news_generator
+from src.util.uploadAsset import good_news_generator, upload_asset
 
 
 async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list):
@@ -49,14 +50,7 @@ async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list)
         else:
             bp_info = user_bp[:5]
 
-        for bp in bp_info:
-            beatmapset = bp.get('beatmapset')
-            cover = beatmapset.get('covers', {}).get('list')
-            kwargs[f"cover{bp.get('id')}"] = await download_and_upload(bot,
-                                                                       cover) if cover else Assets.Image.OSU_LOGO
-            beatmap = bp.get('beatmap')
-            beatmap_info = await api.get_beatmap_info(beatmap.get('id'))
-            kwargs[f"combo{bp.get('id')}"] = beatmap_info.get('max_combo')
+        await __bp_traverse(bot, bp_info, kwargs, api)
 
         return bp_card(bp_info, **kwargs)
 
@@ -88,13 +82,24 @@ async def bp_today_command(bot: Bot, osu_name: str, mode: str):
             good_news = await good_news_generator(bot, f'{username}今天没有新bp')
             return no_bp_card(username, mode, good_news)
 
-        for bp in today_bps:
-            beatmapset = bp.get('beatmapset')
-            cover = beatmapset.get('covers', {}).get('list')
-            kwargs[f"cover{bp.get('id')}"] = await download_and_upload(bot,
-                                                                       cover) if cover else Assets.Image.OSU_LOGO
-            beatmap = bp.get('beatmap')
-            beatmap_info = await api.get_beatmap_info(beatmap.get('id'))
-            kwargs[f"combo{bp.get('id')}"] = beatmap_info.get('max_combo')
+        await __bp_traverse(bot, today_bps, kwargs, api)
 
         return bp_card(today_bps, **kwargs)
+
+
+async def __bp_traverse(bot: Bot, bp_list: list, to: dict, api: OsuApi):
+    tasks = []
+    for bp in bp_list:
+        cover = bp.get('beatmapset').get('covers', {}).get('list')
+        if cover:
+            tasks.append(asyncio.create_task(upload_asset(bot, cover, to, f"cover{bp.get('id')}")))
+        else:
+            to[f"cover{bp.get('id')}"] = Assets.Image.OSU_LOGO
+        tasks.append(asyncio.create_task(__get_max_combo(api, bp.get('beatmap').get('id'), to, f"combo{bp.get('id')}")))
+
+    await asyncio.wait(tasks)
+
+
+async def __get_max_combo(api: OsuApi, beatmap_id: int, to: dict, key: str):
+    beatmap_info = await api.get_beatmap_info(beatmap_id)
+    to[key] = beatmap_info.get('max_combo')

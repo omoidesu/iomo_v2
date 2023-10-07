@@ -20,7 +20,8 @@ async def bind_command(bot: Bot, kook_id: int, username: str):
         user_service.insert(user)
 
         cover = user_info.get('cover_url')
-        kwargs = {}
+        avatar = user_info.get('avatar_url')
+        kwargs = {'avatar': await download_and_upload(bot, avatar)}
         if cover is not None:
             kwargs['cover'] = await download_and_upload(bot, cover)
 

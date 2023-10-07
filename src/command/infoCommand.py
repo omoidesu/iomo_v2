@@ -23,7 +23,8 @@ async def info_command(bot: Bot, osu_name: str, mode: str = '', day: int = 1, us
             compare_info = None
 
         cover = user_info.get('cover_url')
-        kwargs = {'mode': mode}
+        avatar = user_info.get('avatar_url')
+        kwargs = {'mode': mode, 'avatar': await download_and_upload(bot, avatar)}
         if cover is not None:
             kwargs['cover'] = await download_and_upload(bot, cover)
 

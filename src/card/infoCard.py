@@ -65,7 +65,7 @@ def info_card(user_info: dict, compare_user_info: OsuUserInfo = None, **kwargs):
                ]
     card.append(Module.Section(
         Element.Text('\n'.join(section), Types.Text.PLAIN),
-        accessory=Element.Image(user_info.get('avatar_url'), size=Types.Size.SM),
+        accessory=Element.Image(kwargs.get('avatar'), size=Types.Size.SM),
         mode=Types.SectionMode.RIGHT
     ))
     card.append(Modules.divider)

@@ -47,7 +47,8 @@ def mp_card(game: dict, users: dict, scores: list, **kwargs):
 
         section_text += f'\n{format(score.get("score"))}\t\t{score.get("max_combo")}x\t\t{round(score.get("accuracy") * 100, 2)}%'
         section = Module.Section(Element.Text(section_text),
-                                 accessory=Element.Image(user.avatar_url, circle=True, size=Types.Size.SM),
+                                 accessory=Element.Image(kwargs.get(f'avatar{user.get("id")}'), circle=True,
+                                                         size=Types.Size.SM),
                                  mode=Types.SectionMode.LEFT)
         modules.append(section)
 

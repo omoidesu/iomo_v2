@@ -1,3 +1,5 @@
+import asyncio
+
 from khl import Bot
 
 from src.card import mp_card
@@ -6,7 +8,7 @@ from src.dao import Redis
 from src.dto import MultiPlay, User
 from src.exception import OsuApiException
 from src.service import OsuApi
-from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
+from src.util.uploadAsset import generate_stars, upload_asset
 
 
 class MultiPlayCommand:
@@ -83,30 +85,33 @@ class MultiPlayCommand:
                 if not game.get('scores'):
                     continue
 
-                users = data.get('users')
-                for user in users:
-                    user['avatar_url'] = await download_and_upload(bot, user.get('avatar_url'))
-                user_map = {user['id']: User(**user) for user in users}
-
-                beatmap = game.get('beatmap', {})
-                diff = await generate_diff_png_and_upload(bot, beatmap.get('mode'), beatmap.get('difficulty_rating'))
-
                 if game.get('team_type') == 'head-to-head':
+                    tasks = []
+                    kwargs = {}
+
+                    users = data.get('users')
+                    for user in users:
+                        tasks.append(asyncio.create_task(
+                            upload_asset(bot, user.get('avatar_url'), kwargs, f'avatar{user.get("id")}')))
+                    user_map = {user['id']: User(**user) for user in users}
+
+                    beatmap = game.get('beatmap', {})
+                    tasks.append(asyncio.create_task(
+                        generate_stars(bot, beatmap.get('mode'), beatmap.get('difficulty_rating'), kwargs, 'diff')))
+
                     scores = sorted(game.get('scores'), key=lambda x: x.get('score'), reverse=True)
 
-                    kwargs = {}
                     cover = game.get('beatmap', {}).get('beatmapset', {}).get('covers', {}).get('cover')
                     if cover:
-                        kwargs['cover'] = await download_and_upload(bot, cover)
+                        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
                     else:
                         kwargs['cover'] = Assets.Image.DEFAULT_COVER
-
-                    kwargs['diff'] = diff
 
                     obj.event_id = events[-1].get('id')
                     job = bot.task.scheduler.get_job(obj.job_id)
                     job.modify(args=[bot, match_id, obj.event_id])
 
+                    await asyncio.wait(tasks)
                     await bot.client.send(channel, mp_card(game, user_map, scores, **kwargs))
 
             # 房间关闭

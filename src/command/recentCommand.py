@@ -1,13 +1,15 @@
+import asyncio
+
 from khl import Bot, Message
 
 from src.card import recent_card, score_card
-from src.const import redis_recent_beatmap
+from src.const import Assets, redis_recent_beatmap
 from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
 from src.exception import OsuApiException
 from src.service import OsuApi, beatmap_set_service
-from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
+from src.util.uploadAsset import generate_stars, upload_asset
 
 redis = Redis.instance().get_connection()
 
@@ -39,6 +41,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             recent_score = filter(lambda x: set(mod).issubset(x.get('mods', [])), recent_score)
 
         kwargs = {'mode': mode}
+        tasks = []
 
         if ls_mode:
             kwargs['osu_name'] = recent_score[0].get('user', {}).get('username')
@@ -47,7 +50,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             stars = {}
             for score in recent_score:
                 difficult = score.get('beatmap', {}).get('difficulty_rating')
-                stars[difficult] = await generate_diff_png_and_upload(bot, mode, difficult)
+                tasks.append(asyncio.create_task(generate_stars(bot, mode, difficult, stars, difficult)))
 
                 # 保存beatmapset
                 beatmap_set = score.get('beatmapset', {})
@@ -61,9 +64,12 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
                     ))
 
                 cover = beatmap_set.get('covers', {}).get('list')
-                if cover is not None:
-                    kwargs[f"{beatmap_set.get('id')}"] = await download_and_upload(bot, cover)
+                if cover:
+                    tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, f"{beatmap_set.get('id')}")))
+                else:
+                    kwargs[f"{beatmap_set.get('id')}"] = Assets.Image.OSU_LOGO
 
+            await asyncio.wait(tasks)
             kwargs['stars'] = stars
 
             card_msg, id_map = recent_card(recent_score, **kwargs)
@@ -89,14 +95,14 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         # 封面
         cover: str = beatmap_set.get('covers', {}).get('list')
         if cover is not None:
-            kwargs['cover'] = await download_and_upload(bot, cover)
+            tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
         # 试听
-        preview = 'https:' + beatmap_set.get('preview_url')
-        if preview is not None:
-            kwargs['preview'] = await download_and_upload(bot, preview)
+        if beatmap_set.get('preview_url') is not None:
+            tasks.append(
+                asyncio.create_task(upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview')))
 
         difficult = beatmap.get('difficulty_rating')
-        kwargs['star'] = await generate_diff_png_and_upload(bot, mode, difficult)
+        tasks.append(asyncio.create_task(generate_stars(bot, mode, difficult, kwargs, 'star')))
 
         # 保存beatmapset
         if beatmap_set:
@@ -107,8 +113,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             ))
 
         # 获取max combo
-        beatmap_info = await api.get_beatmap_info(beatmap.get('id'))
-        kwargs['fc_combo'] = beatmap_info.get('max_combo')
+        tasks.append(asyncio.create_task(get_max_combo(api, beatmap.get('id'), kwargs, 'fc_combo')))
 
         # todo: 计算模拟pp
         kwargs['fc'] = '-'
@@ -121,4 +126,10 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
         redis.set(redis_key, beatmap.get('id'))
 
+        await asyncio.wait(tasks)
         return score_card(score, beatmap, beatmap_set, **kwargs), None
+
+
+async def get_max_combo(api: OsuApi, beatmap_id: int, to: dict, key: str):
+    beatmap_info = await api.get_beatmap_info(beatmap_id)
+    to[key] = beatmap_info.get('max_combo')

@@ -1,11 +1,13 @@
+import asyncio
+
 from khl import Bot
 
 from src.card import score_card
-from src.const import redis_recent_beatmap
+from src.const import Assets, redis_recent_beatmap
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
-from src.service import OsuApi, SayoApi, beatmap_set_service
-from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
+from src.service import OsuApi, beatmap_set_service
+from src.util.uploadAsset import generate_stars, upload_asset
 
 
 async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id: str, dto: RecentListCacheDTO):
@@ -25,17 +27,20 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
     beatmap = score.get('beatmap', {})
     beatmap_set = score.get('beatmapset', {})
     kwargs = {}
+    tasks = []
     # 封面
     cover: str = beatmap_set.get('covers', {}).get('list')
-    if cover is not None:
-        kwargs['cover'] = await download_and_upload(bot, cover)
+    if cover:
+        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+    else:
+        kwargs['cover'] = Assets.Image.DEFAULT_COVER
     # 试听
     preview = 'https:' + beatmap_set.get('preview_url')
     if preview is not None:
-        kwargs['preview'] = await download_and_upload(bot, preview)
+        tasks.append(asyncio.create_task(upload_asset(bot, preview, kwargs, 'preview')))
 
     difficult = score.get('beatmap', {}).get('difficulty_rating')
-    kwargs['star'] = await generate_diff_png_and_upload(bot, dto.osu_mode, difficult)
+    tasks.append(asyncio.create_task(generate_stars(bot, dto.osu_mode, difficult, kwargs, 'star')))
 
     # 保存beatmapset
     if beatmap_set:
@@ -45,13 +50,8 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
             creator=beatmap_set.get('creator')
         ))
 
-    # 调用sayo api取得max combo
-    sayo_info = await SayoApi.get_beatmap_info(beatmap_set.get('id'))
-    if sayo_info.get('status') == 0:
-        beatmap_id = score.get('beatmap', {}).get('id')
-        bid_info = [item for item in sayo_info.get('data').get('bid_data') if item.get('bid') == beatmap_id]
-        if bid_info:
-            kwargs['fc_combo'] = bid_info[0].get('maxcombo')
+    # 取得max combo
+    tasks.append(asyncio.create_task(get_max_combo(api, beatmap.get('id'), kwargs, 'fc_combo')))
 
     # todo: 计算模拟pp
     kwargs['fc'] = '-'
@@ -64,4 +64,10 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
     redis_key = redis_recent_beatmap.format(guild_id=dto.guild_id, channel_id=channel_id)
     redis_connector.set(redis_key, score.get('beatmap', {}).get('id'))
 
+    await asyncio.wait(tasks)
     return score_card(score, beatmap, beatmap_set, **kwargs)
+
+
+async def get_max_combo(api: OsuApi, beatmap_id: int, to: dict, key: str):
+    beatmap_info = await api.get_beatmap_info(beatmap_id)
+    to[key] = beatmap_info.get('max_combo')

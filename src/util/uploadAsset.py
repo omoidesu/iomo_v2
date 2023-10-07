@@ -106,3 +106,12 @@ async def good_news_generator(bot: Bot, msg: str):
     asset_service.insert(new_asset)
 
     return kook_url
+
+
+async def upload_asset(bot: Bot, url: str, to: dict, key: str, force: bool = False, origin: bool = False):
+    to[key] = await download_and_upload(bot, url, force, origin)
+
+
+async def generate_stars(bot: Bot, mode: str, stars: float, to: dict, key: str, emoji: bool = False,
+                         guild: Guild = None):
+    to[key] = await generate_diff_png_and_upload(bot, mode, stars, emoji, guild)

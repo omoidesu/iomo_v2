@@ -1,13 +1,15 @@
+import asyncio
+
 from khl import Bot, Message
 
 from src.card import score_card
-from src.const import redis_recent_beatmap
+from src.const import Assets, redis_recent_beatmap
+from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.exception import OsuApiException
 from src.service import OsuApi, beatmap_set_service
-from src.util import search_beatmap_sets, filter_and_sort_beatmap_sets
-from src.util.uploadAsset import download_and_upload, generate_diff_png_and_upload
-from src.dao import Redis
+from src.util import filter_and_sort_beatmap_sets, search_beatmap_sets
+from src.util.uploadAsset import generate_stars, upload_asset
 
 
 async def score_command(bot: Bot, msg: Message, artist: str, title: str, source: str, beatmap_id: int,
@@ -104,16 +106,21 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
 
     kwargs = {'position': position}
 
+    tasks = []
+
     cover: str = beatmap_set.get('covers', {}).get('list')
-    if cover is not None:
-        kwargs['cover'] = await download_and_upload(bot, cover)
+    if cover:
+        tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover')))
+    else:
+        kwargs['cover'] = Assets.Image.OSU_LOGO
     # 试听
-    preview = 'https:' + beatmap_set.get('preview_url')
-    if preview is not None:
-        kwargs['preview'] = await download_and_upload(bot, preview)
+    if beatmap_set.get('preview_url'):
+        tasks.append(
+            asyncio.create_task(upload_asset(bot, 'https:' + beatmap_set.get('preview_url'), kwargs, 'preview')))
 
     difficult = beatmap.get('difficulty_rating')
-    kwargs['star'] = await generate_diff_png_and_upload(bot, mode if mode else beatmap.get('mode'), difficult)
+    tasks.append(
+        asyncio.create_task(generate_stars(bot, mode if mode else beatmap.get('mode'), difficult, kwargs, 'star')))
 
     beatmap_set_service.insert(OsuBeatmapSet(
         beatmapset_id=beatmap_set.get('id'), title=beatmap_set.get('title'), artist=beatmap_set.get('artist'),
@@ -134,4 +141,5 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
     redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
     redis.set(redis_key, beatmap.get('id'))
 
+    await asyncio.wait(tasks)
     return score_card(score, beatmap, beatmap_set, **kwargs)

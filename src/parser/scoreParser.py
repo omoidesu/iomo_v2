@@ -13,8 +13,10 @@ async def score_parser(bot: Bot, msg: Message, *args):
 
     # keyword, source, beatmap_id, beatmap_set_id用于确定谱面
     keyword = require_args['keyword']
+    beatmap_id = require_args['beatmap_id']
+    beatmapset_id = require_args['beatmap_set_id']
 
-    if not keyword:
+    if not beatmap_id and not beatmapset_id and not keyword:
         return '请输入谱面信息'
 
     if ' - ' in keyword:
@@ -22,8 +24,6 @@ async def score_parser(bot: Bot, msg: Message, *args):
     else:
         artist, title = '', keyword
     source = require_args['source']
-    beatmap_id = require_args['beatmap_id']
-    beatmapset_id = require_args['beatmap_set_id']
 
     # username, order用于确定查询的用户
     username = require_args['username']
