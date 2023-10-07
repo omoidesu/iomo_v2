@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from src.config import redis_db, redis_host, redis_pass, redis_port
+from src.config import redis_db, redis_host, redis_pass, redis_port, redis_subscribe
 
 
 class SqlSession:
@@ -25,13 +25,20 @@ class SqlSession:
 class Redis:
     _instance = None
     _conn = None
+    _pubsub = None
 
     def __init__(self):
         pool = redis.ConnectionPool(host=redis_host, port=redis_port, password=redis_pass, db=redis_db)
         self._conn = redis.Redis(connection_pool=pool)
+        self._pubsub = self._conn.pubsub()
+        self._pubsub.psubscribe(redis_subscribe)
 
     def get_connection(self):
         return self._conn
+
+    @property
+    def pubsub(self):
+        return self._pubsub
 
     @classmethod
     def instance(cls):

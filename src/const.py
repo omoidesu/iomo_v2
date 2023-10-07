@@ -2,6 +2,7 @@
 redis_access_token = 'osu_access_token'
 redis_refresh_token = 'osu_refresh_token'
 redis_recent_beatmap = '{guild_id}:{channel_id}'
+redis_mp_room = 'mp-{}'
 
 # api
 osu_api = 'https://osu.ppy.sh/api/v2'
@@ -191,7 +192,7 @@ class Assets:
         PLAYCOUNT = '(emj)play(emj)[6147923945822473/bVLhXwDP4v05k05k]'
         FAVOURITE = '(emj)favourate(emj)[6147923945822473/PqzdX063Vj05k05k]'
 
-        MODS = {
+        MOD = {
             'EZ': '(emj)modEZ(emj)[6147923945822473/BNm1HKXTk301900w]',
             'NF': '(emj)modNF(emj)[6147923945822473/liWefVzool01900w]',
             'HT': '(emj)modHT(emj)[6147923945822473/oVrgtIv5BW01900w]',
@@ -217,15 +218,15 @@ class Assets:
         }
 
         RANK = {
-            'A': '(emj)rankA(emj)[6147923945822473/3t1aVcRJLk03g01q]',
-            'B': '(emj)rankB(emj)[6147923945822473/lu1xQGVxHc03g01q]',
-            'C': '(emj)rankC(emj)[6147923945822473/QRj5ZPzUM203g01q]',
-            'D': '(emj)rankD(emj)[6147923945822473/qksOqZNjle03g01q]',
-            'F': '(emj)rankF(emj)[6147923945822473/HkOLe5XdJN03g01q]',
-            'S': '(emj)rankS(emj)[6147923945822473/Pg9N2rp2rg03g01q]',
-            'SH': '(emj)rankSH(emj)[6147923945822473/nBEToRSz4w03f01q]',
-            'X': '(emj)rankX(emj)[6147923945822473/Xj41eVcF2003g01q]',
-            'XH': '(emj)rankXH(emj)[6147923945822473/TQnmo93NY003g01q]'
+            'A': '(emj)rankA(emj)[6147923945822473/SYoDxCWt4g01900w]',
+            'B': '(emj)rankB(emj)[6147923945822473/2WwpsvhGxr01900w]',
+            'C': '(emj)rankC(emj)[6147923945822473/n5ce7Snn2d01900w]',
+            'D': '(emj)rankD(emj)[6147923945822473/FAr2GdugIp01900w]',
+            'F': '(emj)rankF(emj)[6147923945822473/7U11ztN7HN01900w]',
+            'S': '(emj)rankS(emj)[6147923945822473/u3hsPoqVz301900w]',
+            'SH': '(emj)rankSH(emj)[6147923945822473/5CMAVwYVoJ01900w]',
+            'X': '(emj)rankX(emj)[6147923945822473/PzSpitD1h201900w]',
+            'XH': '(emj)rankXH(emj)[6147923945822473/1ZsyUMviZF01900w]'
         }
 
         MODE = {

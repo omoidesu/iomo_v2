@@ -6,8 +6,9 @@ from src.card import search_waiting_card
 from src.command import beatmap_set_command
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, info_parser, mode_parser,
-                        osu_homepage_parser, ping_parser, ranking_parser, reaction_queue, recent_parser, score_parser,
-                        search_parser, unbind_parser)
+                        mp_parser, osu_homepage_parser, ping_parser, ranking_parser, reaction_queue, recent_parser,
+                        score_parser, search_parser, unbind_parser)
+from src.schedule import redis_schedule
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
 bot = Bot(token=bot_token)
@@ -129,6 +130,12 @@ async def rank(msg: Message, *args):
     await msg.reply(reply)
 
 
+@bot.command(name='mp', prefixes=['.', '/'])
+async def mp(msg: Message, *args):
+    reply = await mp_parser(bot, msg, *args)
+    await msg.reply(reply)
+
+
 @bot.command(regex=r'.+https://osu\.ppy\.sh/beatmapsets/\d+.+', prefixes=[])
 async def beatmap_link(msg: Message):
     args = re.findall(r'https://osu\.ppy\.sh/beatmapsets/(\d+)(#(mania|osu|taiko|fruits)/(\d+))?', msg.content)[0]
@@ -164,6 +171,11 @@ async def on_added_emoji(_: Bot, e: Event):
 async def on_btn_click(b: Bot, e: Event):
     body = e.body
     await button_queue.insert_button(bot, me.id, body, emoji_guild)
+
+
+@bot.task.add_interval(seconds=1)
+async def redis_event_handler():
+    await redis_schedule(bot)
 
 
 def save_cardmsg(reply):

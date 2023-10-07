@@ -214,7 +214,7 @@ class OsuApi:
 
                 return await resp.json()
 
-    async def get_match_list(self, cursor_string: str):
+    async def get_match_list(self, cursor_string: str = None):
         """获取mp房间列表"""
         url = f'{osu_api}/matches'
         params = {
@@ -228,13 +228,15 @@ class OsuApi:
 
                 return await resp.json()
 
-    async def get_match_event(self, match_id: int, after: int = None, limit: int = 10):
+    async def get_match_event(self, match_id: int, after: str = '', limit: int = 10, no_limit: bool = False):
         """获取mp游戏信息"""
         url = f'{osu_api}/matches/{match_id}'
         params = {
             'after': after,
-            'limit': limit
         }
+
+        if not no_limit:
+            params['limit'] = limit
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=self._header) as resp:
