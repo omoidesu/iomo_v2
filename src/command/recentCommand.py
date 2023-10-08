@@ -9,7 +9,7 @@ from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
 from src.exception import OsuApiException
 from src.service import OsuApi, beatmap_set_service
-from src.util.uploadAsset import generate_stars, upload_asset
+from src.util.uploadAsset import generate_stars, upload_asset, user_not_found_card
 
 redis = Redis.instance().get_connection()
 
@@ -19,16 +19,20 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
     api = OsuApi()
 
     if not str(osu_name).isdigit():
-        osu_info = await api.get_user(osu_name)
-        osu_name = osu_info.get('id')
-        if mode == '':
-            mode = osu_info.get('playmode')
+        try:
+            osu_info = await api.get_user(osu_name)
+        except OsuApiException as e:
+            return await user_not_found_card(bot, e.do_except(f'找不到名为{osu_name}的玩家')), None
+        else:
+            osu_name = osu_info.get('id')
+            if mode == '':
+                mode = osu_info.get('playmode')
 
     try:
         recent_score = await api.get_recent_score(osu_name, mode=mode, include_fail=include_fail, use_mode=True,
                                                   limit=20)
     except OsuApiException as e:
-        return e.do_except('该用户不存在'), None
+        return await user_not_found_card(bot, e.do_except(f'用户id:{osu_name}不存在')), None
     else:
         if len(recent_score) == 0:
             return '该用户没有最近游玩记录', None

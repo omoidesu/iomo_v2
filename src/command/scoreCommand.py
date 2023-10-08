@@ -9,7 +9,7 @@ from src.dao.models import OsuBeatmapSet
 from src.exception import OsuApiException
 from src.service import OsuApi, beatmap_set_service
 from src.util import filter_and_sort_beatmap_sets, search_beatmap_sets
-from src.util.uploadAsset import generate_stars, upload_asset
+from src.util.uploadAsset import generate_stars, upload_asset, user_not_found_card
 
 
 async def score_command(bot: Bot, msg: Message, artist: str, title: str, source: str, beatmap_id: int,
@@ -29,7 +29,7 @@ async def score_command(bot: Bot, msg: Message, artist: str, title: str, source:
         try:
             osu_info = await api.get_user(osu_name)
         except OsuApiException as e:
-            return e.do_except('该用户不存在')
+            return await user_not_found_card(bot, e.do_except(f'找不到名为{osu_name}的玩家'))
         else:
             osu_name = osu_info.get('id')
             if mode == '':

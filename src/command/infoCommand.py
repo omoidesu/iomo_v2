@@ -3,7 +3,7 @@ from khl import Bot
 from src.card import info_card
 from src.exception import OsuApiException
 from src.service import OsuApi, user_info_service
-from src.util.uploadAsset import download_and_upload
+from src.util.uploadAsset import download_and_upload, user_not_found_card
 
 
 async def info_command(bot: Bot, osu_name: str, mode: str = '', day: int = 1, user_id: int = 0):
@@ -15,7 +15,7 @@ async def info_command(bot: Bot, osu_name: str, mode: str = '', day: int = 1, us
         else:
             user_info = await api.get_user(osu_name, mode=mode, use_mode=True)
     except OsuApiException as e:
-        return e.do_except('该用户不存在')
+        return await user_not_found_card(bot, e.do_except(f'找不到名为{osu_name}的玩家'))
     else:
         if user_id:
             compare_info = user_info_service.select_user_info(user_id, mode=mode, day=day)

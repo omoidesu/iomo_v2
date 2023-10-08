@@ -3,6 +3,7 @@ from khl.card import CardMessage, Element, Module, Types
 from src.const import Assets, bp_index
 from src.util import convert_date
 from ._modules import Modules
+from .commonCard import good_news_card
 
 
 def bp_card(bp_list: list, **kwargs):
@@ -55,7 +56,6 @@ def bp_card(bp_list: list, **kwargs):
 
 
 def no_bp_card(username: str, mode: str, src: str):
-    card_modules = Modules.good_news_card(src,
-                                          header=f'{Assets.Sticker.MODE.get(mode)} **{username}的Best Performance记录**')
+    card_modules = good_news_card(src, header=f'{Assets.Sticker.MODE.get(mode)} **{username}的Best Performance记录**')
 
     return CardMessage(Modules.card(*card_modules, color=Assets.COLOR.get(mode)))

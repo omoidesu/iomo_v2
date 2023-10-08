@@ -117,8 +117,7 @@ class MultiPlayCommand:
 
             # 房间关闭
             elif event_type == 'match-disbanded':
-                bot.task.scheduler.remove_job(obj.job_id)
-                self._rooms.pop(match_id)
+                self.remove_room(bot, match_id, obj.channel_id)
                 await bot.client.send(channel, f'{obj.match_name}房间已关闭')
 
     def list_room(self, channel_id: str):
@@ -129,7 +128,7 @@ class MultiPlayCommand:
 
         return f'正在监听的房间: \n{enter.join([f"{room.match_name} ({room_id})" for room_id, room in self._rooms.items() if room.channel_id == channel_id])}'
 
-    def remove_room(self, bot: Bot, room: str, channel_id: int):
+    def remove_room(self, bot: Bot, room: int, channel_id: int):
         target_room: MultiPlay
 
         if str(room).isdigit():

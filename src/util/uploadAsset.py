@@ -7,11 +7,12 @@ from aiohttp import TCPConnector
 from khl import Bot, Guild
 from meme_generator import get_meme
 
-from src.asset import get_assets
+from src.asset import get_assets, get_user_not_found
 from src.const import Assets
 from src.dao.models import OsuAsset, OsuStarAsset
 from src.exception import NetException
 from src.service import asset_service, star_asset_service
+from src.card import user_not_found_card as card
 
 
 async def download_and_upload(bot: Bot, resource: str, force: bool = False, origin: bool = False):
@@ -101,7 +102,7 @@ async def good_news_generator(bot: Bot, msg: str):
         return asset.oss_url
 
     meme = get_meme('good_news')
-    img: io.BytesIO = await meme(texts=[msg])
+    img = await meme(texts=[msg])
 
     kook_url = await bot.client.create_asset(img.getvalue())
 
@@ -109,6 +110,27 @@ async def good_news_generator(bot: Bot, msg: str):
     asset_service.insert(new_asset)
 
     return kook_url
+
+
+async def user_not_found(bot: Bot, msg: str):
+    asset = asset_service.select_asset(msg)
+    if asset:
+        return asset.oss_url
+
+    meme = get_meme('play_game')
+    img = await meme(images=[get_user_not_found()], texts=[msg])
+
+    kook_url = await bot.client.create_asset(img.getvalue())
+
+    new_asset = OsuAsset(source_url=msg, oss_url=kook_url)
+    asset_service.insert(new_asset)
+
+    return kook_url
+
+
+async def user_not_found_card(bot: Bot, msg: str):
+    src = await user_not_found(bot, msg)
+    return card(src)
 
 
 async def upload_asset(bot: Bot, url: str, to: dict, key: str, default: str, force: bool = False, origin: bool = False):

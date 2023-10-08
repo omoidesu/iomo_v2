@@ -7,17 +7,21 @@ from src.card import bp_card, no_bp_card
 from src.const import Assets
 from src.exception import OsuApiException
 from src.service import OsuApi
-from src.util.uploadAsset import good_news_generator, upload_asset
+from src.util.uploadAsset import good_news_generator, upload_asset, user_not_found_card
 
 
 async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list):
     api = OsuApi()
 
     if not str(osu_name).isdigit():
-        osu_info = await api.get_user(osu_name)
-        osu_name = osu_info.get('id')
-        if mode == '':
-            mode = osu_info.get('playmode')
+        try:
+            osu_info = await api.get_user(osu_name)
+        except OsuApiException as e:
+            return await user_not_found_card(bot, e.do_except(f'找不到名为{osu_name}的玩家'))
+        else:
+            osu_name = osu_info.get('id')
+            if mode == '':
+                mode = osu_info.get('playmode')
 
     limit = 5
     if order != 0:
@@ -30,7 +34,7 @@ async def bp_command(bot: Bot, osu_name: str, order: int, mode: str, mods: list)
     try:
         user_bp = await api.get_best_score(osu_name, mode=mode, limit=limit)
     except OsuApiException as e:
-        return e.do_except('该用户不存在')
+        return await user_not_found_card(bot, e.do_except(f'用户id:{osu_name}不存在'))
     else:
         if len(user_bp) == 0:
             return '该用户没有bp记录'
@@ -59,17 +63,21 @@ async def bp_today_command(bot: Bot, osu_name: str, mode: str):
     api = OsuApi()
 
     if not str(osu_name).isdigit():
-        osu_info = await api.get_user(osu_name)
-        osu_name = osu_info.get('id')
-        if mode == '':
-            mode = osu_info.get('playmode')
+        try:
+            osu_info = await api.get_user(osu_name)
+        except OsuApiException as e:
+            return await user_not_found_card(bot, e.do_except(f'找不到名为{osu_name}的玩家'))
+        else:
+            osu_name = osu_info.get('id')
+            if mode == '':
+                mode = osu_info.get('playmode')
 
     kwargs = {}
 
     try:
         user_bp = await api.get_best_score(osu_name, mode=mode, limit=100)
     except OsuApiException as e:
-        return e.do_except('该用户不存在')
+        return await user_not_found_card(bot, e.do_except(f'用户id:{osu_name}不存在'))
     else:
         if len(user_bp) == 0:
             return '该用户没有bp记录'

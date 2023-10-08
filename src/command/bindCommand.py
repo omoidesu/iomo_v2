@@ -4,7 +4,7 @@ from src.card import info_card
 from src.dao.models import OsuUser
 from src.exception import OsuApiException
 from src.service import OsuApi, user_service
-from src.util.uploadAsset import download_and_upload
+from src.util.uploadAsset import download_and_upload, user_not_found_card
 
 
 async def bind_command(bot: Bot, kook_id: int, username: str):
@@ -13,7 +13,7 @@ async def bind_command(bot: Bot, kook_id: int, username: str):
     try:
         user_info = await api.get_user(username)
     except OsuApiException as e:
-        return e.do_except('绑定失败，请输入正确的osu用户名'), None
+        return await user_not_found_card(bot, e.do_except('绑定失败，请输入正确的osu用户名')), None
     else:
         user = OsuUser(kook_id=kook_id, osu_id=user_info.get('id'), osu_name=user_info.get('username'),
                        default_mode=user_info.get('playmode'))
