@@ -14,23 +14,23 @@ redis_db = 0
 redis_subscribe = f'__keyevent@{redis_db}__:expired'
 
 # kook bot token
-bot_token = '1/MTA2MDQ=/HWm7zympOUBjWpRxEK5EHw=='
+bot_token = ''
 
 # osu api token
-client_id = 6587
-client_secret = "ULY2zz2uUqdkxZ7u65M7trUZfpamZZV6E1wxtwox"
+client_id = 0
+client_secret = ''
 
 # admin
-admin_id = ('565510950',)
+admin_id = ('',)
 
 # playing status
 playing_game_id = 5883  # osu!
 
 # emoji guild
-emoji_guild = '9325863522261945'
+emoji_guild = ''
 
 # channel for user's osu homepage url, when catch osu homepage url will register automatically
-user_channel = ('8896430597770990', '4272896228850685',)
+user_channel = ('', '',)
 
 # osu guild
 osu_guild = '5107224330983339'
