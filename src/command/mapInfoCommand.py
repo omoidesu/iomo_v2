@@ -56,4 +56,5 @@ async def beatmap_command(bot: Bot, beatmap_id: int):
     tasks.append(
         asyncio.create_task(generate_stars(bot, beatmap.get('mode'), beatmap.get('difficulty_rating'), kwargs, 'diff')))
 
+    await asyncio.wait(tasks)
     return beatmap_card(beatmap, **kwargs), beatmap.get('beatmapset', {}).get('id'), beatmap.get('id')
