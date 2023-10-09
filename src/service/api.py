@@ -7,7 +7,7 @@ from aiohttp import TCPConnector
 from src.config import client_id, client_secret
 from src.const import osu_api, redis_access_token, redis_refresh_token, sayo_api
 from src.dao import Redis
-from src.exception import ArgsException, OsuApiException
+from src.exception import ArgsException, NetException, OsuApiException
 
 
 class OsuApi:
@@ -280,7 +280,7 @@ class SayoApi:
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
             async with session.post(url, data=json.dumps(data)) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'搜索谱面失败 code: {resp.status}')
+                    raise NetException(f'搜索谱面失败 code: {resp.status}')
 
                 return await resp.json()
 
@@ -295,10 +295,19 @@ class SayoApi:
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
             async with session.get(url, params=params) as resp:
                 if resp.status != 200:
-                    raise OsuApiException(f'获取谱面信息失败 code: {resp.status}')
+                    raise NetException(f'获取谱面信息失败 code: {resp.status}')
 
                 return json.loads(await resp.text())
 
+    @staticmethod
+    async def download_beatmaps(beatmapset_id: int):
+        url = f'https://dl.sayobot.cn/beatmaps/download/novideo/{beatmapset_id}'
+        async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    raise NetException(f'下载失败 code: {resp.status}')
+
+                return await resp.content.read()
 
 class Chimu:
     ...
