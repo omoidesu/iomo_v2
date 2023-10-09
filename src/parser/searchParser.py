@@ -2,7 +2,6 @@ from khl import Bot, Guild, Message
 
 from src.command import beatmap_command, beatmap_set_command, search_command
 from src.util import construct_message_obj
-from src.util.afterCommend import delete_emojis
 from src.util.log import save_log
 from ._commonParser import args_parser
 
@@ -32,5 +31,5 @@ async def search_parser(bot: Bot, msg: Message, guild: Guild, reply_msg_id: str,
         else:
             artist, title = '', keyword
 
-    card_msg, emojis = await search_command(bot, keyword, artist, title, source, guild)
-    return reply_msg, card_msg, delete_emojis, guild, emojis
+    await search_command.insert_search(bot, keyword, artist, title, source, guild, reply_msg)
+    return None, None, None, None

@@ -7,6 +7,7 @@ from .rankingCommand import ranking_command
 from .recationCallback import reaction_callback
 from .recentCommand import recent_command
 from .scoreCommand import score_command
-from .searchCommand import search_command, upload_assets_and_generate_search_card
+from .searchCommand import SearchQueue, upload_assets_and_generate_search_card
 
 mp_command = MultiPlayCommand.instance()
+search_command = SearchQueue.get_instance()

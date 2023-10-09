@@ -1,7 +1,8 @@
 import asyncio
 import pickle
+from collections import deque
 
-from khl import Bot, Guild
+from khl import Bot, Guild, Message
 
 from src.card import search_card
 from src.const import Assets
@@ -9,32 +10,81 @@ from src.dao import Redis
 from src.dto import BeatmapSet, SearchListCacheDTO
 from src.service import OsuApi, asset_service
 from src.util import IdGenerator, filter_and_sort_beatmap_sets, search_beatmap_sets
-from src.util.uploadAsset import generate_diff_png_and_upload, upload_asset
-
-id_generator = IdGenerator(1, 10)
+from src.util.uploadAsset import generate_diff_png_and_upload, upload_asset, user_not_found_card
 
 
-async def search_command(bot: Bot, keyword: str, artist: str, title: str, source: str, guild: Guild):
-    redis = Redis.instance().get_connection()
+class SearchQueue:
+    _instance: 'SearchQueue' = None
+    _is_running: bool = False
+    _queue: deque = deque()
+    _redis = Redis.instance().get_connection()
+    _emojis: list
+    _bot: Bot = None
+    _guild: Guild = None
+    _id_generator = IdGenerator(1, 10)
 
-    search_id = id_generator.get_id()
-    search_maps, _ = await search_beatmap_sets(title, source, '')
-    if len(search_maps) == 0:
-        return '未找到相关谱面'
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
 
-    search_maps = filter_and_sort_beatmap_sets(artist, title, search_maps)
+    async def insert_search(self, bot: Bot, keyword: str, artist: str, title: str, source: str, guild: Guild,
+                            msg: Message):
+        if not self._bot:
+            self._bot = bot
 
-    # 每页谱面数
-    step = 5
-    pages = [search_maps[i:i + step] for i in range(0, len(search_maps), step)]
-    has_next = False
-    if len(pages) > 1:
-        cache_dto = SearchListCacheDTO(keyword, source, pages)
-        redis.set(f'search:{search_id}', pickle.dumps(cache_dto))
-        has_next = True
+        if not self._guild:
+            self._guild = guild
 
-    return await upload_assets_and_generate_search_card(bot, guild, source, pages[0], keyword, search_id, 0, len(pages),
-                                                        has_next=has_next)
+        args = {
+            'keyword': keyword,
+            'artist': artist,
+            'title': title,
+            'source': source,
+            'message': msg
+        }
+        self._queue.append(args)
+        if not self._is_running:
+            self._is_running = True
+            await self._do_search()
+
+    async def _do_search(self):
+        while len(self._queue) > 0:
+            args = self._queue.popleft()
+
+            keyword = args.get('keyword')
+            artist = args.get('artist')
+            title = args.get('title')
+            source = args.get('source')
+            message: Message = args.get('message')
+
+            search_id = self._id_generator.get_id()
+            search_maps, _ = await search_beatmap_sets(title, source, '')
+            if len(search_maps) == 0:
+                card = await user_not_found_card(self._bot, '未找到相关谱面')
+                await message.update(card)
+
+            search_maps = filter_and_sort_beatmap_sets(artist, title, search_maps)
+
+            # 每页谱面数
+            step = 5
+            pages = [search_maps[i:i + step] for i in range(0, len(search_maps), step)]
+            has_next = False
+            if len(pages) > 1:
+                cache_dto = SearchListCacheDTO(keyword, source, pages)
+                self._redis.set(f'search:{search_id}', pickle.dumps(cache_dto))
+                has_next = True
+
+            card, emojis = await upload_assets_and_generate_search_card(self._bot, self._guild, source, pages[0],
+                                                                        keyword, search_id, 0, len(pages),
+                                                                        has_next=has_next)
+            await message.update(card)
+
+            tasks = [asyncio.create_task(self._guild.delete_emoji(emoji)) for emoji in emojis]
+            await asyncio.wait(tasks)
+
+        self._is_running = False
 
 
 async def upload_assets_and_generate_search_card(bot: Bot, guild: Guild, source: str, beatmapsets: list[BeatmapSet],

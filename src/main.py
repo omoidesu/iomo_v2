@@ -105,11 +105,12 @@ async def compare(msg: Message):
 async def search(msg: Message, *args):
     waiting = await msg.reply(search_waiting_card())
     waiting_msg, reply, func, *f_args = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
-    await waiting_msg.update(reply)
-    if func:
-        after = await func(*f_args)
-        if after:
-            await waiting_msg.update(after)
+    if waiting_msg:
+        await waiting_msg.update(reply)
+        if func:
+            after = await func(*f_args)
+            if after:
+                await waiting_msg.update(after)
 
 
 @bot.command(name='bp', prefixes=['.', '/'])

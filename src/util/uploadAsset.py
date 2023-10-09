@@ -1,6 +1,8 @@
 import io
 import math
+import os
 
+import aiofiles
 import aiohttp
 from PIL import Image
 from aiohttp import TCPConnector
@@ -8,11 +10,11 @@ from khl import Bot, Guild
 from meme_generator import get_meme
 
 from src.asset import get_assets, get_user_not_found
+from src.card import user_not_found_card as card
 from src.const import Assets
 from src.dao.models import OsuAsset, OsuStarAsset
 from src.exception import NetException
 from src.service import asset_service, star_asset_service
-from src.card import user_not_found_card as card
 
 
 async def download_and_upload(bot: Bot, resource: str, force: bool = False, origin: bool = False):
@@ -40,7 +42,11 @@ async def download_and_upload(bot: Bot, resource: str, force: bool = False, orig
 
 async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: bool = False, guild: Guild = None):
     stars = round(diff, 2)
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'difficulty', f'{mode}{diff}.png')
 
+    if emoji and os.path.exists(path):
+        with aiofiles.open(path, 'rb') as f:
+            return await guild.create_emoji(emoji=io.BytesIO(await f.read()), name=f'{mode}{diff}'.replace('.', ''))
     if not emoji:
         asset = star_asset_service.selectStarAssert(mode=mode, star=stars)
         if asset is not None:
@@ -88,6 +94,8 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: 
     bytes_io = io.BytesIO()
     sm.save(bytes_io, format='png')
     if emoji:
+        async with aiofiles.open(path, 'wb') as f:
+            await f.write(bytes_io.getvalue())
         return await guild.create_emoji(emoji=io.BytesIO(bytes_io.getvalue()), name=f'{mode}{diff}'.replace('.', ''))
 
     kook_url = await bot.client.create_asset(io.BytesIO(bytes_io.getvalue()))
