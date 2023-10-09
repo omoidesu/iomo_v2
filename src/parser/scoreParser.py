@@ -1,8 +1,9 @@
 from khl import Bot, Message
-from ._commonParser import args_parser
-from src.util.log import save_log
-from src.service import user_service
+
 from src.command import score_command
+from src.service import user_service
+from src.util.log import save_log
+from ._commonParser import args_parser
 
 
 async def score_parser(bot: Bot, msg: Message, *args):
