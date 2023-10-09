@@ -45,7 +45,7 @@ async def generate_diff_png_and_upload(bot: Bot, mode: str, diff: float, emoji: 
     path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'difficulty', f'{mode}{diff}.png')
 
     if emoji and os.path.exists(path):
-        with aiofiles.open(path, 'rb') as f:
+        async with aiofiles.open(path, 'rb') as f:
             return await guild.create_emoji(emoji=io.BytesIO(await f.read()), name=f'{mode}{diff}'.replace('.', ''))
     if not emoji:
         asset = star_asset_service.selectStarAssert(mode=mode, star=stars)
