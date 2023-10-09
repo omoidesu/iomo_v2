@@ -56,6 +56,4 @@ def bp_card(bp_list: list, **kwargs):
 
 
 def no_bp_card(username: str, mode: str, src: str):
-    card_modules = good_news_card(src, header=f'{Assets.Sticker.MODE.get(mode)} **{username}的Best Performance记录**')
-
-    return CardMessage(Modules.card(*card_modules, color=Assets.COLOR.get(mode)))
+    return good_news_card(src, header=f'{Assets.Sticker.MODE.get(mode)} **{username}的Best Performance记录**')
