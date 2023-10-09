@@ -179,7 +179,12 @@ async def redis_event_handler():
     await redis_schedule(bot)
 
 
-# @bot.task.add_cron()
+@bot.task.add_cron(hour=2)
+async def refresh_osu_token():
+    from src.service import OsuApi
+
+    api = OsuApi()
+    await api.refresh_token()
 
 
 def save_cardmsg(reply):
