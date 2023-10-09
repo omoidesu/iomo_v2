@@ -20,7 +20,7 @@ def mp_card(game: dict, users: dict, scores: list, **kwargs):
         global_mods = ['NM']
     end_time = convert_date(game.get('end_time'))
 
-    header_text = f'{source}({artist} - {title})' if source else f'{artist} - {title}'
+    header_text = f'{source}({artist}) - {title}' if source else f'{artist} - {title}'
     modules.append(Module.Header(Element.Text(f'{header_text}[{version}]')))
 
     context = Module.Context(Element.Image(kwargs.get('diff')))

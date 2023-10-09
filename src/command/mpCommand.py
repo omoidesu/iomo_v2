@@ -92,7 +92,8 @@ class MultiPlayCommand:
                     users = data.get('users')
                     for user in users:
                         tasks.append(asyncio.create_task(
-                            upload_asset(bot, user.get('avatar_url'), kwargs, f'avatar{user.get("id")}')))
+                            upload_asset(bot, user.get('avatar_url'), kwargs, f'avatar{user.get("id")}',
+                                         Assets.Image.DEFAULT_AVATAR)))
                     user_map = {user['id']: User(**user) for user in users}
 
                     beatmap = game.get('beatmap', {})
