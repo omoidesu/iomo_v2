@@ -1,4 +1,5 @@
 from .api import OsuApi, SayoApi
+from .minioClient import MinioClient
 from .sqlService import AssetService, BeatmapDiffService, BeatmapService, BeatmapSetService, LogService, \
     StarAssertService, UserInfoService, UserService
 

@@ -5,9 +5,9 @@ from khl import Bot, Event, EventTypes, Guild, Message, User
 from src.card import waiting_card
 from src.command import beatmap_set_command
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
-from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, info_parser, mode_parser,
-                        mp_parser, osu_homepage_parser, ping_parser, ranking_parser, reaction_queue, recent_parser,
-                        score_parser, search_parser, unbind_parser)
+from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, copy_parser, info_parser,
+                        mode_parser, mp_parser, osu_homepage_parser, ping_parser, ranking_parser, reaction_queue,
+                        recent_parser, score_parser, search_parser, unbind_parser)
 from src.schedule import redis_schedule
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
@@ -135,6 +135,13 @@ async def rank(msg: Message, *args):
 async def mp(msg: Message, *args):
     reply = await mp_parser(bot, msg, *args)
     await msg.reply(reply)
+
+
+@bot.command(name='copy', aliases=['cp'], prefixes=['.', '/'])
+async def copy(msg: Message, *args):
+    waiting = await msg.reply(waiting_card('下载中，请稍候'))
+    reply, waiting_msg = await copy_parser(bot, msg, waiting.get('msg_id'), me.id, *args)
+    await waiting_msg.update(reply)
 
 
 @bot.command(regex=r'.+https://osu\.ppy\.sh/beatmapsets/\d+.+', prefixes=[])

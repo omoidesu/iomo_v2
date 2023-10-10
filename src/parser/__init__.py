@@ -4,6 +4,7 @@ from src.util.log import save_log
 from .bpParser import bp_parser, bp_today_parser
 from .buttonQueue import ButtonQueue
 from .compareParser import compare_parser
+from .copyParser import copy_parser
 from .infoParser import info_parser
 from .mpParser import mp_parser
 from .rankingParser import ranking_parser

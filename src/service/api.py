@@ -47,9 +47,9 @@ class OsuApi:
             'Authorization': f'Bearer {self._access_token}'
         }
 
-    def refresh_token(self):
+    async def refresh_token(self):
         """刷新token"""
-        url = 'osu.ppy.sh/oauth/token'
+        url = 'https://osu.ppy.sh/oauth/token'
         data = {
             'grant_type': 'refresh_token',
             'client_id': client_id,
@@ -57,11 +57,13 @@ class OsuApi:
             'refresh_token': self._refresh_token
         }
 
-        resp = requests.post(url, data=data)
-        if resp.status_code != 200:
-            raise OsuApiException(f'刷新token失败 code: {resp.status_code}')
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=data) as resp:
+                if resp.status != 200:
+                    raise OsuApiException(f'刷新token失败 code: {resp.status}')
 
-        resp_json = resp.json()
+                resp_json = await resp.json()
+
         self._access_token = resp_json['access_token']
         self._refresh_token = resp_json['refresh_token']
 
@@ -302,12 +304,17 @@ class SayoApi:
     @staticmethod
     async def download_beatmaps(beatmapset_id: int):
         url = f'https://dl.sayobot.cn/beatmaps/download/novideo/{beatmapset_id}'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+            'referer': 'https://osu.sayobot.cn/home'
+        }
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
             async with session.get(url) as resp:
                 if resp.status != 200:
                     raise NetException(f'下载失败 code: {resp.status}')
 
                 return await resp.content.read()
+
 
 class Chimu:
     ...
