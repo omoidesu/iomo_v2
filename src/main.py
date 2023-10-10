@@ -2,7 +2,7 @@ import re
 
 from khl import Bot, Event, EventTypes, Guild, Message, User
 
-from src.card import search_waiting_card
+from src.card import waiting_card
 from src.command import beatmap_set_command
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, info_parser, mode_parser,
@@ -103,7 +103,7 @@ async def compare(msg: Message):
 
 @bot.command(name='search', prefixes=['.', '/'])
 async def search(msg: Message, *args):
-    waiting = await msg.reply(search_waiting_card())
+    waiting = await msg.reply(waiting_card('正在搜索中，请稍候'))
     waiting_msg, reply, func, *f_args = await search_parser(bot, msg, emoji_guild, waiting.get('msg_id'), me.id, *args)
     if waiting_msg:
         await waiting_msg.update(reply)
@@ -169,7 +169,7 @@ async def on_added_emoji(_: Bot, e: Event):
 
 
 @bot.on_event(EventTypes.MESSAGE_BTN_CLICK)
-async def on_btn_click(b: Bot, e: Event):
+async def on_btn_click(_: Bot, e: Event):
     body = e.body
     await button_queue.insert_button(bot, me.id, body, emoji_guild)
 

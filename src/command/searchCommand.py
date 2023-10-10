@@ -4,7 +4,7 @@ from collections import deque
 
 from khl import Bot, Guild, Message
 
-from src.card import search_card
+from src.card import search_card, waiting_card
 from src.const import Assets
 from src.dao import Redis
 from src.dto import BeatmapSet, SearchListCacheDTO
@@ -44,8 +44,11 @@ class SearchQueue:
             'source': source,
             'message': msg
         }
+        length = len(self._queue)
         self._queue.append(args)
-        if not self._is_running:
+        if self._is_running:
+            return waiting_card(f'排队中，请稍候 (前方还有{length}个等待搜索)')
+        else:
             self._is_running = True
             await self._do_search()
 

@@ -3,7 +3,7 @@ from collections import deque
 
 from khl import Bot, Guild
 
-from src.card import search_waiting_card
+from src.card import waiting_card
 from src.command import beatmap_set_command, upload_assets_and_generate_search_card
 from src.dao import Redis
 from src.dto import SearchListCacheDTO
@@ -58,7 +58,7 @@ class ButtonQueue:
                 pass_msg.append(msg_id)
 
                 msg = construct_message_obj(bot, msg_id, channel_id, guild_id, bot_id)
-                await msg.update(search_waiting_card())
+                await msg.update(waiting_card('正在搜索中，请稍候'))
 
                 _, search_id, method, value = values
 
