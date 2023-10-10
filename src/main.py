@@ -3,7 +3,7 @@ import re
 from khl import Bot, Event, EventTypes, Guild, Message, User
 
 from src.card import waiting_card
-from src.command import beatmap_set_command
+from src.command import beatmap_set_command, update_osu_info
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, copy_parser, info_parser,
                         mode_parser, mp_parser, osu_homepage_parser, ping_parser, ranking_parser, reaction_queue,
@@ -192,6 +192,11 @@ async def refresh_osu_token():
 
     api = OsuApi()
     await api.refresh_token()
+
+
+@bot.task.add_cron(hour=3)
+async def update_user_info():
+    await update_osu_info()
 
 
 def save_cardmsg(reply):

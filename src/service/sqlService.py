@@ -154,6 +154,9 @@ class UserService(__SqlService):
         self._session.query(OsuUser).filter(OsuUser.kook_id == kook_id).update(kwargs)
         self._session.commit()
 
+    def select_all_users(self):
+        return self._session.query(OsuUser).all()
+
 
 class UserInfoService(__SqlService):
     def __init__(self):

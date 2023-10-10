@@ -1,8 +1,11 @@
+import asyncio
+
 from khl import Bot
 
 from src.card import info_card
 from src.exception import OsuApiException
-from src.service import OsuApi, user_info_service
+from src.service import OsuApi, user_info_service, user_service
+from src.util.afterCommend import collect_user_info
 from src.util.uploadAsset import download_and_upload, user_not_found_card
 
 
@@ -29,3 +32,13 @@ async def info_command(bot: Bot, osu_name: str, mode: str = '', day: int = 1, us
             kwargs['cover'] = await download_and_upload(bot, cover)
 
         return info_card(user_info, compare_user_info=compare_info, **kwargs)
+
+
+async def update_osu_info():
+    users = user_service.select_all_users()
+    tasks = []
+    for i in range(0, len(users), 50):
+        id_map = {str(user.osu_id): user.id for user in users[i:i + 50]}
+        tasks.append(asyncio.create_task(collect_user_info(**id_map)))
+
+    await asyncio.wait(tasks)
