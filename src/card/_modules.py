@@ -37,7 +37,8 @@ class Modules:
         return Module.Context(text)
 
     @staticmethod
-    def beatmap_info(beatmapset: dict, beatmap: dict, mode: str, cover: str, left_mode: bool = False) -> _Module:
+    def beatmap_info(beatmapset: dict, beatmap: dict, mode: str, kwargs: dict, left_mode: bool = False,
+                     special_mode: bool = False) -> _Module:
         count_circles = beatmap.get('count_circles')
         count_sliders = beatmap.get('count_sliders')
         count_spinners = beatmap.get('count_spinners')
@@ -49,19 +50,43 @@ class Modules:
         hp = beatmap.get('drain')
         stars = beatmap.get('difficulty_rating')
 
+        sim_ar = kwargs.get('ar')
+        sim_od = kwargs.get('od')
+        sim_cs = kwargs.get('cs')
+        sim_hp = kwargs.get('hp')
+        sim_star = kwargs.get('star_rating')
+
         rows = [
             f'> {Assets.Sticker.STATUS.get(beatmap.get("status"))} ▸id: {beatmap.get("id")} ▸ 难度名: {beatmap.get("version")}' if left_mode else f'▸作者: {beatmapset.get("creator")} ▸谱面id: {beatmap.get("id")}',
             f'▸长度: {seconds_to_str(beatmap.get("total_length"))} ▸BPM: {beatmap.get("bpm")} ▸物件数: {total_notes}',
             f'▸圈数: {count_circles} ▸滑条数: {count_sliders} ▸转盘数: {count_spinners}'
         ]
 
-        if mode == 'taiko':
+        if special_mode and mode == 'taiko':
+            rows.append(
+                f'▸OD:{sim_od}{"↑" if sim_od > od else "↓"} '
+                f'▸HP:{sim_hp if sim_hp else hp}{("↑" if sim_hp > hp else "↓") if sim_hp else ""} '
+                f'▸Stars:{sim_star}{"↑" if sim_star > stars else "↓"}★')
+        elif special_mode and mode == 'mania':
+            rows.append(
+                f'▸Keys:{cs} ▸OD:{sim_od}{"↑" if sim_od > od else "↓"} '
+                f'▸HP:{sim_hp if sim_hp else hp}{("↑" if sim_hp > hp else "↓") if sim_hp else ""} '
+                f'▸Stars:{sim_star}{"↑" if sim_star > stars else "↓"}★')
+        elif special_mode:
+            rows.append(
+                f'▸CS:{sim_cs if sim_cs else cs}{("↑" if sim_cs > cs else "↓") if sim_cs else ""} '
+                f'▸AR:{sim_ar}{"↑" if sim_ar > ar else "↓"} '
+                f'▸OD:{sim_od}{"↑" if sim_od > od else "↓"} '
+                f'▸HP:{sim_hp if sim_hp else hp}{("↑" if sim_hp > hp else "↓") if sim_hp else ""} '
+                f'▸Stars:{sim_star}{"↑" if sim_star > stars else "↓"}★')
+        elif mode == 'taiko':
             rows.append(f'▸OD:{od} ▸HP:{hp} ▸Stars:{stars}★')
         elif mode == 'mania':
             rows.append(f'▸Keys:{cs} ▸OD:{od} ▸HP:{hp} ▸Stars:{stars}★')
         else:
             rows.append(f'▸CS:{cs} ▸AR:{ar} ▸OD:{od} ▸HP:{hp} ▸Stars:{stars}★')
 
+        cover = kwargs.get('cover')
         cover = Assets.Image.OSU_LOGO if not cover else cover
         return Module.Section('\n'.join(rows), accessory=Element.Image(cover, size=Types.Size.SM),
                               mode=Types.SectionMode.LEFT if left_mode else Types.SectionMode.RIGHT)
@@ -85,7 +110,7 @@ class Modules:
 
         # header
         artist_str = f'{source}({artist_unicode})' if source else artist_unicode
-        modules.append(Module.Header(f'{artist_str} - {title_unicode} [{version}]'))
+        modules.append(Module.Section(f'**{artist_str} - {title_unicode} [{version}]**'))
 
         # context1
         context1 = Module.Context(Element.Text(f'{artist} - {title} | '))

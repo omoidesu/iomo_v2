@@ -21,10 +21,10 @@ async def recent_parser(bot: Bot, msg: Message, *args, include_fail=False):
     ls_mode = False
     if '-ls' in args:
         ls_mode = True
-        osu_name = osu_name.replace('-ls', '')
+        osu_name = osu_name.replace('-ls', '').strip()
     if '-list' in args:
         ls_mode = True
-        osu_name = osu_name.replace('-list', '')
+        osu_name = osu_name.replace('-list', '').strip()
 
     # 如果有@人则查询osu信息是被@人绑定的信息
     if len(msg.mention) > 0:

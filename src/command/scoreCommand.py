@@ -135,13 +135,20 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
         beatmap_id = beatmap.get('id')
         mods = score.get('mods')
         statistics = score.get('statistics')
-        await simulate_pp_with_accuracy(beatmap_id, 100, mode, '')
-        tasks.append(asyncio.create_task(simulate_if_fc(beatmap_id, mode, mods, statistics, kwargs, 'fc')))
-        tasks.append(asyncio.create_task(get_osu_pp(beatmap_id, 95, mode, mods, kwargs, '95')))
-        tasks.append(asyncio.create_task(get_osu_pp(beatmap_id, 97, mode, mods, kwargs, '97')))
-        tasks.append(asyncio.create_task(get_osu_pp(beatmap_id, 98, mode, mods, kwargs, '98')))
-        tasks.append(asyncio.create_task(get_osu_pp(beatmap_id, 99, mode, mods, kwargs, '99')))
-        tasks.append(asyncio.create_task(get_osu_pp(beatmap_id, 100, mode, mods, kwargs, 'ss')))
+        await simulate_pp_with_accuracy(beatmap_id, 100, mode, [])
+        tasks.append(asyncio.create_task(simulate_if_fc(beatmap_id, mode, mods, statistics, kwargs)))
+        tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 95, mode, mods, kwargs, '95')))
+        tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 97, mode, mods, kwargs, '97')))
+        tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 98, mode, mods, kwargs, '98')))
+        tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 99, mode, mods, kwargs, '99')))
+        tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 100, mode, mods, kwargs, 'ss')))
+
+        if 'HR' in mods:
+            kwargs['cs'] = round(beatmap.get('cs') * 1.3, 2)
+            kwargs['hp'] = round(beatmap.get('drain') * 1.4, 2)
+        elif 'EZ' in mods:
+            kwargs['cs'] = round(beatmap.get('cs') * 0.5, 2)
+            kwargs['hp'] = round(beatmap.get('drain') * 0.5, 2)
 
     redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
     redis.set(redis_key, beatmap.get('id'))
@@ -150,9 +157,9 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
     return score_card(score, beatmap, beatmap_set, **kwargs)
 
 
-async def get_osu_pp(beatmap_id: int, accuracy: float, mode: str, mods: str, to: dict, key: str):
+async def simulate_pp(beatmap_id: int, accuracy: float, mode: str, mods: list, to: dict, key: str):
     to[key] = await simulate_pp_with_accuracy(beatmap_id, accuracy, mode, mods)
 
 
-async def simulate_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict, to: dict, key: str):
-    to[key] = await simulate_pp_if_fc(beatmap_id, mode, mods, statistics)
+async def simulate_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict, to: dict):
+    to['fc'], to['star_rating'], to['ar'], to['od'] = await simulate_pp_if_fc(beatmap_id, mode, mods, statistics)

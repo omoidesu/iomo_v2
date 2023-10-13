@@ -13,7 +13,8 @@ async def simulate_pp_with_accuracy(beatmap_id: int, accuracy: float, mode: str,
         for mod in mods:
             cmd += ' -m ' + mod
 
-    return await do_simulate(cmd)
+    pp, _, _, _ = await do_simulate(cmd)
+    return pp
 
 
 async def simulate_pp_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict):
@@ -44,6 +45,11 @@ async def do_simulate(cmd: str):
         if out.startswith('Downloading'):
             out = out.split('...\r\n')[1]
         data = json.loads(out)
-        return round(data.get('performance_attributes').get('pp'))
+        pp = round(data.get('performance_attributes').get('pp'))
+        difficulty_attributes = data.get('difficulty_attributes')
+        star_rating = round(difficulty_attributes.get('star_rating'), 2)
+        ar = round(difficulty_attributes.get('approach_rate'), 2)
+        od = round(difficulty_attributes.get('overall_difficulty'), 2)
+        return pp, star_rating, ar, od
     else:
         return '-'
