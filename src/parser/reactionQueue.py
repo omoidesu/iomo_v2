@@ -23,6 +23,8 @@ class ReactionQueue:
 
     async def insert_reaction(self, bot: Bot, bot_id: int, reaction: dict):
         self._reaction_queue.append(reaction)
+        if len(self._reaction_queue) == 0:
+            self._is_running = False
         if not self._is_running:
             self._is_running = True
             await self._parse_reaction(bot, bot_id)
