@@ -34,6 +34,11 @@ class MultiPlayCommand:
                 if e.code == 404:
                     ...
             else:
+                events = match.get('events', [])
+                if events and events[-1].get('detail', {}).get('type') == 'match-disbanded':
+                    match_name = match.get('match', {}).get('name')
+                    return f'房间{match_name}已关闭 请确认id是否正确'
+
                 match_id = match.get('match', {}).get('id')
                 return self.__add_jobs(bot, match, match_id, channel_id)
 
@@ -62,6 +67,11 @@ class MultiPlayCommand:
             return '该房间已在监听中'
 
         match = await api.get_match_event(match_id, no_limit=True)
+        events = match.get('events', [])
+        if events and events[-1].get('detail', {}).get('type') == 'match-disbanded':
+            match_name = match.get('match', {}).get('name')
+            return f'房间{match_name}已关闭 请确认房间名称或直接输入房间id'
+
         return self.__add_jobs(bot, match, match_id, channel_id)
 
     async def get_mp_events(self, bot: Bot, match_id: int, after: str):
