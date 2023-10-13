@@ -8,7 +8,7 @@ from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
 from src.exception import OsuApiException
-from src.service import OsuApi, beatmap_set_service
+from src.service import OsuApi, beatmap_set_service, simulate_pp_with_accuracy, simulate_pp_if_fc
 from src.util.uploadAsset import generate_stars, upload_asset, user_not_found_card
 
 redis = Redis.instance().get_connection()
@@ -121,13 +121,17 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
         # 获取max combo
         tasks.append(asyncio.create_task(get_max_combo(api, beatmap.get('id'), kwargs, 'fc_combo')))
 
-        # todo: 计算模拟pp
-        kwargs['fc'] = '-'
-        kwargs['95'] = '-'
-        kwargs['97'] = '-'
-        kwargs['98'] = '-'
-        kwargs['99'] = '-'
-        kwargs['ss'] = '-'
+        if mode != 'mania':
+            beatmap_id = beatmap.get('id')
+            mods = score.get('mods')
+            statistics = score.get('statistics')
+            await simulate_pp_with_accuracy(beatmap_id, 100, mode, [])
+            tasks.append(asyncio.create_task(simulate_if_fc(beatmap_id, mode, mods, statistics, kwargs, 'fc')))
+            tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 95, mode, mods, kwargs, '95')))
+            tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 97, mode, mods, kwargs, '97')))
+            tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 98, mode, mods, kwargs, '98')))
+            tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 99, mode, mods, kwargs, '99')))
+            tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 100, mode, mods, kwargs, 'ss')))
 
         redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
         redis.set(redis_key, beatmap.get('id'))
@@ -139,3 +143,11 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
 async def get_max_combo(api: OsuApi, beatmap_id: int, to: dict, key: str):
     beatmap_info = await api.get_beatmap_info(beatmap_id)
     to[key] = beatmap_info.get('max_combo')
+
+
+async def simulate_pp(beatmap_id: int, accuracy: float, mode: str, mods: list, to: dict, key: str):
+    to[key] = await simulate_pp_with_accuracy(beatmap_id, accuracy, mode, mods)
+
+
+async def simulate_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict, to: dict, key: str):
+    to[key] = await simulate_pp_if_fc(beatmap_id, mode, mods, statistics)
