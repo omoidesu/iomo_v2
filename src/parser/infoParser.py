@@ -1,6 +1,6 @@
 from khl import Bot, Message
 
-from src.command import info_command
+from src.command import info_command, update_user_asset
 from src.service import user_service
 from src.util.log import save_log
 from ._commonParser import args_parser
@@ -50,3 +50,13 @@ async def info_parser(bot: Bot, msg: Message, *args):
     day = 1 if day == 0 else day
     # 调用osu api并生成卡片
     return await info_command(bot, str(osu_name), mode, int(day), user_id)
+
+
+async def update_asset_parser(bot: Bot, msg: Message):
+    kook_id = save_log(msg)
+
+    user = user_service.select_user(kook_id=kook_id)
+    if not user:
+        return '你还没有绑定账号 输入/bind [osu用户名]绑定账号'
+
+    return await update_user_asset(bot, user.osu_id, kook_id)

@@ -42,3 +42,18 @@ async def update_osu_info():
         tasks.append(asyncio.create_task(collect_user_info(**id_map)))
 
     await asyncio.wait(tasks)
+
+
+async def update_user_asset(bot: Bot, osu_id: str, kook_id: str):
+    api = OsuApi()
+
+    data = await api.get_user(osu_id)
+    avatar_url = data.get('avatar_url')
+    cover_url = data.get('cover_url')
+    username = data.get('username')
+    await download_and_upload(bot, avatar_url, force=True)
+    await download_and_upload(bot, cover_url, force=True)
+
+    user_service.update_user(kook_id, username)
+
+    return '更新成功'

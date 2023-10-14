@@ -7,7 +7,7 @@ from src.command import beatmap_set_command, update_osu_info
 from src.config import admin_id, bot_token, emoji_guild as guild_id, playing_game_id
 from src.parser import (bind_parser, bp_parser, bp_today_parser, button_queue, compare_parser, copy_parser, info_parser,
                         mode_parser, mp_parser, osu_homepage_parser, ping_parser, ranking_parser, reaction_queue,
-                        recent_parser, score_parser, search_parser, unbind_parser)
+                        recent_parser, score_parser, search_parser, unbind_parser, update_asset_parser)
 from src.schedule import redis_schedule
 from src.util.afterCommend import add_reaction, cache_map_to_redis, collect_user_info
 
@@ -164,6 +164,12 @@ async def refresh_osu_token(msg: Message):
         await msg.reply('token刷新成功')
     else:
         await msg.reply('你不是管理员，无权使用该命令')
+
+
+@bot.command(name='update')
+async def update(msg: Message):
+    reply = await update_asset_parser(bot, msg)
+    await msg.reply(reply)
 
 
 @bot.command(regex=r'.+https://osu\.ppy\.sh/beatmapsets/\d+.+', prefixes=[])
