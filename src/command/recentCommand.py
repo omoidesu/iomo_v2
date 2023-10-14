@@ -125,7 +125,10 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
             beatmap_id = beatmap.get('id')
             mods = score.get('mods')
             statistics = score.get('statistics')
-            await simulate_pp_with_accuracy(beatmap_id, 100, mode, [])
+            try:
+                await simulate_pp_with_accuracy(beatmap_id, 100, mode, [])
+            except:
+                pass
             tasks.append(asyncio.create_task(simulate_if_fc(beatmap_id, mode, mods, statistics, kwargs)))
             tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 95, mode, mods, kwargs, '95')))
             tasks.append(asyncio.create_task(simulate_pp(beatmap_id, 97, mode, mods, kwargs, '97')))
