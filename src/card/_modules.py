@@ -176,9 +176,9 @@ class Modules:
         elements = []
 
         if_fc = kwargs.get('fc')
-        fc_str = 'max pp' if mania else 'if fc'
+        fc_str = 'max' if mania else 'fc'
         if if_fc is not None:
-            elements.append(Element.Text(f'**{fc_str}** : {if_fc} pp', type=Types.Text.KMD))
+            elements.append(Element.Text(f'**{fc_str}**(*{kwargs.get("if_acc")}%*) : {if_fc} pp ', type=Types.Text.KMD))
 
         for key in keys:
             pp = kwargs.get(key)

@@ -1,6 +1,7 @@
 import asyncio
-from src.config import osu_tools_path
 import json
+
+from src.config import osu_tools_path
 
 
 async def simulate_pp_with_accuracy(beatmap_id: int, accuracy: float, mode: str, mods: list):
@@ -13,7 +14,7 @@ async def simulate_pp_with_accuracy(beatmap_id: int, accuracy: float, mode: str,
         for mod in mods:
             cmd += ' -m ' + mod
 
-    pp, _, _, _ = await do_simulate(cmd)
+    pp, _, _, _, _ = await do_simulate(cmd)
     return pp
 
 
@@ -50,6 +51,7 @@ async def do_simulate(cmd: str):
         star_rating = round(difficulty_attributes.get('star_rating'), 2)
         ar = round(difficulty_attributes.get('approach_rate'), 2)
         od = round(difficulty_attributes.get('overall_difficulty'), 2)
-        return pp, star_rating, ar, od
+        acc = round(data.get('score', {}).get('accuracy', 0), 2)
+        return pp, star_rating, ar, od, acc
     else:
         return '-'

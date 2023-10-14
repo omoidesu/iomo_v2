@@ -144,6 +144,28 @@ async def copy(msg: Message, *args):
     await waiting_msg.update(reply)
 
 
+@bot.command(name='pp', prefixes=['.', '/'])
+async def pp(msg: Message, *args):
+    await msg.reply('该功能未完成')
+
+
+@bot.command(name='music', prefixes=['.', '/'])
+async def music(msg: Message, *args):
+    await msg.reply('该功能未完成')
+
+
+@bot.command(name='token')
+async def refresh_osu_token(msg: Message):
+    from src.service import OsuApi
+
+    if msg.author.id in admin_id:
+        api = OsuApi()
+        await api.refresh_token()
+        await msg.reply('token刷新成功')
+    else:
+        await msg.reply('你不是管理员，无权使用该命令')
+
+
 @bot.command(regex=r'.+https://osu\.ppy\.sh/beatmapsets/\d+.+', prefixes=[])
 async def beatmap_link(msg: Message):
     args = re.findall(r'https://osu\.ppy\.sh/beatmapsets/(\d+)(#(mania|osu|taiko|fruits)/(\d+))?', msg.content)[0]

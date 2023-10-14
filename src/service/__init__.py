@@ -1,6 +1,6 @@
 from .api import OsuApi, SayoApi
 from .minioClient import MinioClient
-from .ppCalc import simulate_pp_if_fc, simulate_pp_with_accuracy
+from .ppSimulator import simulate_pp_if_fc, simulate_pp_with_accuracy
 from .sqlService import AssetService, BeatmapDiffService, BeatmapService, BeatmapSetService, LogService, \
     StarAssertService, UserInfoService, UserService
 

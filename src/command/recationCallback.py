@@ -91,4 +91,5 @@ async def simulate_pp(beatmap_id: int, accuracy: float, mode: str, mods: list, t
 
 
 async def simulate_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict, to: dict):
-    to['fc'], to['star_rating'], to['ar'], to['od'] = await simulate_pp_if_fc(beatmap_id, mode, mods, statistics)
+    to['fc'], to['star_rating'], to['ar'], to['od'], to['if_acc'] = await simulate_pp_if_fc(beatmap_id, mode, mods,
+                                                                                            statistics)
