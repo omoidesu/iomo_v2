@@ -9,7 +9,7 @@ async def simulate_pp_with_accuracy(beatmap_id: int, accuracy: float, mode: str,
         return '-'
 
     mode = 'catch' if mode == 'fruits' else mode
-    cmd = f'cd {osu_tools_path} & dotnet run -- simulate {mode} {beatmap_id} -j -a {accuracy}'
+    cmd = f'dotnet run --project {osu_tools_path} -- simulate {mode} {beatmap_id} -j -a {accuracy}'
     if mods:
         for mod in mods:
             cmd += ' -m ' + mod
@@ -20,7 +20,7 @@ async def simulate_pp_with_accuracy(beatmap_id: int, accuracy: float, mode: str,
 
 async def simulate_pp_if_fc(beatmap_id: int, mode: str, mods: list, statistics: dict):
     mode = 'catch' if mode == 'fruits' else mode
-    cmd = f'cd {osu_tools_path} & dotnet run -- simulate {mode} {beatmap_id} -j'
+    cmd = f'dotnet run --project {osu_tools_path} -- simulate {mode} {beatmap_id} -j'
     if mods:
         for mod in mods:
             cmd += ' -m ' + mod
