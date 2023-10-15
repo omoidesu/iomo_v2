@@ -24,6 +24,7 @@ async def on_startup(b: Bot):
     await b.client.update_playing_game(playing_game_id)
 
     emoji_guild = await bot.client.fetch_guild(guild_id)
+    print('bot 启动!')
 
 
 @bot.command(name='prpr', aliases=['ping'], prefixes=['.', '/'])
@@ -119,7 +120,7 @@ async def bp(msg: Message, *args):
     await msg.reply(reply)
 
 
-@bot.command(name='bptoday', aliases=['bpme'], prefixes=['.', '/'])
+@bot.command(name='bptoday', aliases=['bpme', 't', 'today'], prefixes=['.', '/'])
 async def bptoday(msg: Message, *args):
     reply = await bp_today_parser(bot, msg, *args)
     await msg.reply(reply)
