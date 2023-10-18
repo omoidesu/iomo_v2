@@ -76,7 +76,11 @@ async def score_command(bot: Bot, msg: Message, artist: str, title: str, source:
             score_info = await api.get_beatmap_score(beatmap_info.get('id'), osu_name, mode=mode)
         except OsuApiException as e:
             if e.code == 404:
-                continue
+                beatmapset = beatmap_info.get("beatmapset", {})
+                if beatmapset:
+                    return f'你没有谱面{beatmapset.get("artist")} - {beatmapset.get("title")}[{beatmap_info.get("version")}] {mode}模式成绩'
+                else:
+                    return f'你没有谱面id{beatmap_info.get("id")} {mode}模式成绩'
             e.do_except('')
         else:
             return await upload_assets_and_generate_card(bot, msg, score_info.get('score'), beatmap_info,
