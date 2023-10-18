@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Type
 
 from sqlalchemy import or_
@@ -25,6 +26,7 @@ class __SqlService:
     def insert(self, obj: Base):
         if not isinstance(obj, OsuBeatmap) or not isinstance(obj, OsuBeatmapSet):
             obj.id = self.new_id()
+        obj.create_time = datetime.now()
         self._session.add(obj)
         try:
             self._session.commit()

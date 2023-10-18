@@ -1,5 +1,4 @@
 # coding: utf-8
-from datetime import datetime
 
 from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,7 +14,7 @@ class OsuAsset(Base):
     id = Column(BigInteger, primary_key=True, comment='id')
     source_url = Column(String(500), comment='资源地址')
     oss_url = Column(String(500), comment='oss地址')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuBeatmap(Base):
@@ -32,7 +31,7 @@ class OsuBeatmap(Base):
     circle_count = Column(Integer, comment='圆圈数量')
     slider_count = Column(Integer, comment='滑条数量')
     spinner_count = Column(Integer, comment='转盘数量')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuBeatmapDiff(Base):
@@ -52,7 +51,7 @@ class OsuBeatmapDiff(Base):
     acc98 = Column(Float, comment='acc98')
     acc99 = Column(Float, comment='acc99')
     acc100 = Column(Float, comment='acc100')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuBeatmapSet(Base):
@@ -65,7 +64,7 @@ class OsuBeatmapSet(Base):
     artist = Column(String(255), comment='艺术家')
     artist_unicode = Column(String(255), comment='艺术家(unicode)')
     creator = Column(String(255), comment='谱面作者')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuLog(Base):
@@ -78,7 +77,7 @@ class OsuLog(Base):
     kook_num = Column(Integer, comment='kook数字')
     command = Column(String(255), comment='命令')
     args = Column(String(255), comment='参数')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuStarAsset(Base):
@@ -89,7 +88,7 @@ class OsuStarAsset(Base):
     mode = Column(String(10), comment='模式')
     star = Column(String(5), comment='难度')
     asset = Column(String(255), comment='资源')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuUser(Base):
@@ -101,7 +100,7 @@ class OsuUser(Base):
     osu_id = Column(BigInteger, comment='osuid')
     osu_name = Column(String(255), comment='osu名称')
     default_mode = Column(String(10), comment='默认模式')
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
 
 
 class OsuUserInfo(Base):
@@ -123,4 +122,4 @@ class OsuUserInfo(Base):
     sh_count = Column(Integer, comment='sh次数', default=0)
     s_count = Column(Integer, comment='s次数', default=0)
     a_count = Column(Integer, comment='a次数', default=0)
-    create_time = Column(DateTime, comment='创建时间', default=datetime.now())
+    create_time = Column(DateTime, comment='创建时间')
