@@ -58,6 +58,7 @@ async def score_command(bot: Bot, msg: Message, artist: str, title: str, source:
 
     if order_mode:
         beatmap_info = beatmaps[0]
+        mode = beatmap_info.get("mode")
         top_score_json = await api.get_beatmap_top_score(beatmap_info.get('id'), mode)
         top_scores = top_score_json.get('scores')
         if len(top_scores) == 0:
