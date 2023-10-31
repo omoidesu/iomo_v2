@@ -88,7 +88,9 @@ class Modules:
 
         cover = kwargs.get('cover')
         cover = Assets.Image.OSU_LOGO if not cover else cover
-        return Module.Section('\n'.join(rows), accessory=Element.Image(cover, size=Types.Size.SM),
+        return Module.Section('\n'.join(rows),
+                              accessory=Element.Image(kwargs.get(f'{mode}{stars}')) if left_mode else Element.Image(
+                                  cover, size=Types.Size.SM),
                               mode=Types.SectionMode.LEFT if left_mode else Types.SectionMode.RIGHT)
 
     @staticmethod

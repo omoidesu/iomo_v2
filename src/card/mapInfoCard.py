@@ -59,8 +59,7 @@ def beatmap_set_card(beatmap_set: dict, beatmap_id: int, **kwargs):
         mode = beatmap.get('mode')
         diff = beatmap.get('difficulty_rating')
         if beatmap_id and beatmap_id == beatmap.get('id'):
-            beatmap_info = Modules.beatmap_info({}, beatmap, beatmap.get('mode'), kwargs.get(f'{mode}{diff}'),
-                                                left_mode=True)
+            beatmap_info = Modules.beatmap_info({}, beatmap, beatmap.get('mode'), kwargs, left_mode=True)
         else:
             beatmap_info = Module.Context(Element.Image(kwargs.get(f'{mode}{diff}')))
             beatmap_info.append(Element.Text('|'))
