@@ -37,6 +37,7 @@ class __SqlService:
         for obj in objs:
             if not isinstance(obj, OsuBeatmap) or not isinstance(obj, OsuBeatmapSet):
                 obj.id = self.new_id()
+            obj.create_time = datetime.now()
         self._session.add_all(objs)
         self._session.commit()
 
