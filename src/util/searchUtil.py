@@ -38,14 +38,9 @@ def filter_and_sort_beatmap_sets(artist: str, title: str, beatmap_sets: list[Bea
 
     # 根据artist筛选，剔除与artist不匹配的set
     if artist:
-        # 输入的是字母数字，匹配beatmap_set.artist和beatmap_set.artist_unicode
-        if artist.replace(' ', '').isalnum():
-            beatmap_sets = list(
-                filter(lambda x: artist.lower() in x.artist.lower() or artist.lower() in x.artist_unicode.lower,
-                       beatmap_sets))
-        # 输入的包含其他字符，只匹配beatmap_set.artist_unicode
-        else:
-            beatmap_sets = list(filter(lambda x: artist.lower() in x.artist_unicode.lower, beatmap_sets))
+        beatmap_sets = list(
+            filter(lambda x: artist.lower() in x.artist.lower() or artist.lower() in x.artist_unicode.lower(),
+                   beatmap_sets))
 
     # 排序
     beatmap_sets = sorted(beatmap_sets, key=lambda x: x.play_count, reverse=True)
