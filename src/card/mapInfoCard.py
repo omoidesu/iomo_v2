@@ -93,7 +93,7 @@ def beatmap_card(beatmap: dict, **kwargs):
     context = Module.Context(Element.Image(kwargs.get('diff')))
     context.append(Element.Text(f' | {artist} - {title}'))
 
-    map_info = Modules.beatmap_info(beatmapset, beatmap, beatmap.get('mode'), kwargs.get('cover'))
+    map_info = Modules.beatmap_info(beatmapset, beatmap, beatmap.get('mode'), kwargs)
 
     download_module = Modules.download_module(beatmapset)
 
