@@ -1,11 +1,15 @@
 from khl import Bot, Guild, GuildEmoji, Message
 
-from src.const import game_modes
+from src.const import game_modes, redis_reaction
 from src.dao import Redis
 from src.dao.models import OsuUserInfo
 from src.dto import RecentListCacheDTO
 from src.service import OsuApi, user_info_service
+from src.util.idGenerator import IdGenerator
 from .messageUtil import construct_message_obj
+
+id_generator = IdGenerator(1, 9)
+expire_time = 24 * 60 * 60
 
 
 async def collect_user_info(**kwargs):
@@ -46,9 +50,12 @@ async def collect_user_info(**kwargs):
 
 def cache_map_to_redis(msg_id: str, dto: RecentListCacheDTO):
     redis = Redis.instance().get_connection()
+    recent_id = id_generator.get_id()
 
-    redis.set(msg_id, dto.to_json_str())
-    redis.expire(msg_id, 24 * 60 * 60)
+    redis.set(msg_id, redis_reaction.format(method="recent", id=recent_id))
+    redis.set(recent_id, dto.to_json_str())
+    redis.expire(msg_id, expire_time)
+    redis.expire(recent_id, expire_time)
 
 
 async def add_reaction(bot: Bot, msg_id: str, raw_msg: Message, user_id: str, dto: RecentListCacheDTO):

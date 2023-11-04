@@ -1,10 +1,8 @@
 from khl.card import Card, CardMessage, Element, Module, Types
 
-from src.const import Assets
-from ._modules import Modules
+from src.const import Assets, index_emojis
 from src.util import kmarkdown_format
-
-nums = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣')
+from ._modules import Modules
 
 
 def recent_card(recent_score: list, **kwargs):
@@ -21,7 +19,7 @@ def recent_card(recent_score: list, **kwargs):
     id_map = {}
 
     for score in recent_score:
-        id_map[nums[recent_score.index(score)]] = score.get('id')
+        id_map[index_emojis[recent_score.index(score)]] = score.get('id')
         beatmapset = score.get('beatmapset')
         artist = kmarkdown_format(beatmapset.get('artist_unicode'))
         title = kmarkdown_format(beatmapset.get('title_unicode'))

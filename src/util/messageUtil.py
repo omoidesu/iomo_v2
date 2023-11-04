@@ -15,3 +15,10 @@ def construct_message_obj(bot: Bot, msg_id: str, channel_id: str, guild_id: str,
             }
         }
     )
+
+
+async def fetch_message(bot: Bot, msg_id: str):
+    method = 'GET'
+    route = 'message/view'
+
+    return await bot.client.gate.request(method=method, route=f"{route}?msg_id={msg_id}")

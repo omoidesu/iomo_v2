@@ -201,9 +201,10 @@ async def on_added_emoji(_: Bot, e: Event):
         return
 
     await reaction_queue.insert_reaction(bot, me.id, {'msg_id': msg_id, 'user_id': user_id, 'emoji_id': emoji_id,
-                                                      'channel_id': channel_id})
+                                                      'channel_id': channel_id}, emoji_guild)
 
 
+# deprecated 因为kook调整了卡片消息中按钮的相应，故目前没有包含按钮的卡片消息，该事件暂时不会被触发
 @bot.on_event(EventTypes.MESSAGE_BTN_CLICK)
 async def on_btn_click(_: Bot, e: Event):
     body = e.body

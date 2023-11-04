@@ -61,11 +61,18 @@ class SearchListCacheDTO:
     _keyword: str
     _source: str
     _pages: list[list[BeatmapSet]]
+    _reactions: dict[str, int]
+    _current_page: int
+    _guild_id: str
 
-    def __init__(self, keyword: str, source: str, pages: list[list[BeatmapSet]]):
+    def __init__(self, keyword: str, source: str, pages: list[list[BeatmapSet]], reactions: dict[str, int],
+                 current_page: int, guild_id: str):
         self._keyword = keyword
         self._source = source
         self._pages = pages
+        self._reactions = reactions
+        self._current_page = current_page
+        self._guild_id = guild_id
 
     @property
     def keyword(self):
@@ -78,3 +85,15 @@ class SearchListCacheDTO:
     @property
     def pages(self):
         return self._pages
+
+    @property
+    def reactions(self):
+        return self._reactions
+
+    @property
+    def current_page(self):
+        return self._current_page
+
+    @property
+    def guild_id(self):
+        return self._guild_id

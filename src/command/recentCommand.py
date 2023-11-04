@@ -8,7 +8,7 @@ from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
 from src.exception import OsuApiException
-from src.service import OsuApi, beatmap_set_service, simulate_pp_with_accuracy, simulate_pp_if_fc
+from src.service import OsuApi, beatmap_set_service, simulate_pp_if_fc, simulate_pp_with_accuracy
 from src.util.uploadAsset import generate_stars, upload_asset, user_not_found_card
 
 redis = Redis.instance().get_connection()
@@ -143,6 +143,7 @@ async def recent_command(bot: Bot, msg: Message, osu_name: str, mode: str, mod: 
                 kwargs['cs'] = round(beatmap.get('cs') * 0.5, 2)
                 kwargs['hp'] = round(beatmap.get('drain') * 0.5, 2)
 
+        # 记录最近一次查询的谱面id 给compare命令使用
         redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
         redis.set(redis_key, beatmap.get('id'))
 

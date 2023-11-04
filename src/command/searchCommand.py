@@ -5,11 +5,11 @@ from collections import deque
 from khl import Bot, Guild, Message
 
 from src.card import search_card, waiting_card
-from src.const import Assets
+from src.const import Assets, index_emojis, redis_reaction
 from src.dao import Redis
 from src.dto import BeatmapSet, SearchListCacheDTO
 from src.service import OsuApi, asset_service
-from src.util import IdGenerator, filter_and_sort_beatmap_sets, search_beatmap_sets
+from src.util import IdGenerator, construct_message_obj, filter_and_sort_beatmap_sets, search_beatmap_sets
 from src.util.uploadAsset import generate_diff_png_and_upload, upload_asset, user_not_found_card
 
 
@@ -30,7 +30,7 @@ class SearchQueue:
         return cls._instance
 
     async def insert_search(self, bot: Bot, keyword: str, artist: str, title: str, source: str, guild: Guild,
-                            msg: Message):
+                            msg: Message, bot_id: str):
         if not self._bot:
             self._bot = bot
 
@@ -50,9 +50,9 @@ class SearchQueue:
             return waiting_card(f'排队中，请稍候 (前方还有{length}个等待搜索)')
         else:
             self._is_running = True
-            await self._do_search()
+            await self._do_search(bot, bot_id)
 
-    async def _do_search(self):
+    async def _do_search(self, bot, bot_id):
         while len(self._queue) > 0:
             args = self._queue.popleft()
 
@@ -73,26 +73,48 @@ class SearchQueue:
             # 每页谱面数
             step = 5
             pages = [search_maps[i:i + step] for i in range(0, len(search_maps), step)]
-            has_next = False
-            if len(pages) > 1:
-                cache_dto = SearchListCacheDTO(keyword, source, pages)
-                self._redis.set(f'search:{search_id}', pickle.dumps(cache_dto))
-                has_next = True
 
+            # 上传资源并生成搜索卡片
             card, emojis = await upload_assets_and_generate_search_card(self._bot, self._guild, source, pages[0],
-                                                                        keyword, search_id, 0, len(pages),
-                                                                        has_next=has_next)
-            await message.update(card)
+                                                                        keyword, 0, len(pages))
 
-            tasks = [asyncio.create_task(self._guild.delete_emoji(emoji)) for emoji in emojis]
-            await asyncio.wait(tasks)
+            # 卡片索引与对应谱面集id的映射
+            index_beatmap = {}
+            for i in range(len(pages[0])):
+                index_beatmap[index_emojis[i]] = pages[0][i].id
+
+            # 是否有下一页
+            has_next = True if len(pages) > 1 else False
+            cache_dto = SearchListCacheDTO(keyword, source, pages, index_beatmap, 0, message.ctx.guild.id)
+
+            # 更新等待卡片为搜索结果
+            await message.update(card)
+            # 将搜索结果缓存到redis
+            self._redis.set(message.id, redis_reaction.format(method="search", id=search_id))
+            self._redis.set(search_id, pickle.dumps(cache_dto))
+
+            # 生成消息对象
+            search_result_message: Message = construct_message_obj(bot, message.id, message.ctx.channel.id,
+                                                                   message.ctx.guild.id, bot_id)
+
+            # 根据映射中的key添加回应
+            for emoji in index_beatmap.keys():
+                await search_result_message.add_reaction(emoji)
+
+            # 如果存在下一页添加下一页的按钮
+            if has_next:
+                await search_result_message.add_reaction('arrow_right')
+
+            # 删除表情
+            if emojis:
+                tasks = [asyncio.create_task(self._guild.delete_emoji(emoji)) for emoji in emojis]
+                await asyncio.wait(tasks)
 
         self._is_running = False
 
 
 async def upload_assets_and_generate_search_card(bot: Bot, guild: Guild, source: str, beatmapsets: list[BeatmapSet],
-                                                 keyword: str, search_id: int, current_page: int, total_page: int,
-                                                 has_next: bool = False, has_prev: bool = False):
+                                                 keyword: str, current_page: int, total_page: int):
     tasks = []
     task = []
 
@@ -137,8 +159,7 @@ async def upload_assets_and_generate_search_card(bot: Bot, guild: Guild, source:
                                                  Assets.Image.DEFAULT_COVER)))
 
     await asyncio.wait(tasks)
-    return search_card(keyword, beatmapsets, search_id, current_page, total_page, prev=has_prev, next=has_next,
-                       **kwargs), emojis
+    return search_card(keyword, beatmapsets, current_page, total_page, **kwargs), emojis
 
 
 async def __generate_diff(bot, mode, diff, guild, to: dict, emojis):

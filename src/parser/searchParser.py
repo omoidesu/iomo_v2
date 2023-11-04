@@ -31,5 +31,5 @@ async def search_parser(bot: Bot, msg: Message, guild: Guild, reply_msg_id: str,
         else:
             artist, title = '', keyword
 
-    await search_command.insert_search(bot, keyword, artist, title, source, guild, reply_msg)
+    await search_command.insert_search(bot, keyword, artist, title, source, guild, reply_msg, bot_id)
     return None, None, None, None

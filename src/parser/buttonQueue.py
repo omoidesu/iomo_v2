@@ -1,14 +1,8 @@
-import pickle
 from collections import deque
 
 from khl import Bot, Guild
 
-from src.card import waiting_card
-from src.command import beatmap_set_command, upload_assets_and_generate_search_card
 from src.dao import Redis
-from src.dto import SearchListCacheDTO
-from src.util import construct_message_obj
-from src.util.afterCommend import delete_emojis
 
 
 class ButtonQueue:
@@ -52,7 +46,8 @@ class ButtonQueue:
                 continue
 
             if values[0] == 'search':
-                if len(values) != 4:
+                # 以前的搜索逻辑，目前已弃用。仅供以后如果需要扩展按钮回调时参考
+                """if len(values) != 4:
                     continue
 
                 pass_msg.append(msg_id)
@@ -88,6 +83,6 @@ class ButtonQueue:
                                                                                     has_next=has_next,
                                                                                     has_prev=has_prev)
                     await msg.update(card_msg)
-                    await delete_emojis(guild, emojis)
+                    await delete_emojis(guild, emojis)"""
 
         self._is_running = False

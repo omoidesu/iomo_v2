@@ -1,7 +1,8 @@
 # redis_key
 redis_access_token = 'osu_access_token'
 redis_refresh_token = 'osu_refresh_token'
-redis_recent_beatmap = '{guild_id}:{channel_id}'
+redis_recent_beatmap = '{guild_id}:{channel_id}:recent'
+redis_reaction = '{method}:{id}'
 redis_mp_room = 'mp-{}'
 
 # api
@@ -19,6 +20,8 @@ osu_source = 'osu'
 sayo_source = 'sayo'
 
 game_modes = (_osu, _taiko, _fruits, _mania)
+
+index_emojis = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣')
 
 # 匹配更多参数
 game_mode_map = {
