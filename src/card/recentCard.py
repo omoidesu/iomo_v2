@@ -31,7 +31,7 @@ def recent_card(recent_score: list, **kwargs):
 
         context = Module.Context()
 
-        context.append(Element.Text(f'{nums[recent_score.index(score)]} '))
+        context.append(Element.Text(f'{index_emojis[recent_score.index(score)]} '))
         context.append(Element.Image(kwargs.get(str(beatmapset.get('id')), Assets.Image.OSU_LOGO)))
         context.append(Element.Text(
             f' **[{artist} - {title}](https://osu.ppy.sh/beatmapsets/{beatmapset.get("id")})**', type=Types.Text.KMD

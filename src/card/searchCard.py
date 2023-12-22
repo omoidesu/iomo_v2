@@ -22,16 +22,19 @@ def search_card(keyword: str, beatmapsets: list[BeatmapSet], current: int, total
 
         stickers = '*▸* '
 
-        for beatmap in beatmapset.beatmaps:
-            key = f'{beatmap.mode}{beatmap.difficulty_rating}'
-            sticker = kwargs.get(key)
-            if sticker is None:
-                continue
-            stickers += f'{sticker}'
+        try:
+            for beatmap in beatmapset.beatmaps:
+                key = f'{beatmap.mode}{beatmap.difficulty_rating}'
+                sticker = kwargs.get(key)
+                if sticker is None:
+                    continue
+                stickers += f'{sticker}'
 
-        beatmaps_count = len(beatmapset.beatmaps)
-        if beatmaps_count > 15:
-            stickers += f'*+{beatmaps_count - 14}*'
+            beatmaps_count = len(beatmapset.beatmaps)
+            if beatmaps_count > 15:
+                stickers += f'*+{beatmaps_count - 14}*'
+        except AttributeError:
+            pass
 
         beatmapset_info.append(stickers)
 

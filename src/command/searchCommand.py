@@ -62,53 +62,57 @@ class SearchQueue:
             source = args.get('source')
             message: Message = args.get('message')
 
-            search_id = self._id_generator.get_id()
-            search_maps, _ = await search_beatmap_sets(title, source, '')
-            if len(search_maps) == 0:
-                card = await user_not_found_card(self._bot, '未找到相关谱面')
+            try:
+                search_id = self._id_generator.get_id()
+                search_maps, _ = await search_beatmap_sets(title, source, '')
+                if len(search_maps) == 0:
+                    card = await user_not_found_card(self._bot, '未找到相关谱面')
+                    await message.update(card)
+
+                search_maps = filter_and_sort_beatmap_sets(artist, title, search_maps)
+
+                # 每页谱面数
+                step = 5
+                pages = [search_maps[i:i + step] for i in range(0, len(search_maps), step)]
+
+                # 上传资源并生成搜索卡片
+                card, emojis = await upload_assets_and_generate_search_card(self._bot, self._guild, source, pages[0],
+                                                                            keyword, 0, len(pages))
+
+                # 卡片索引与对应谱面集id的映射
+                index_beatmap = {}
+                for i in range(len(pages[0])):
+                    index_beatmap[index_emojis[i]] = pages[0][i].id
+
+                # 是否有下一页
+                has_next = True if len(pages) > 1 else False
+                cache_dto = SearchListCacheDTO(keyword, source, pages, index_beatmap, 0, message.ctx.guild.id)
+
+                # 更新等待卡片为搜索结果
                 await message.update(card)
+                # 将搜索结果缓存到redis
+                self._redis.set(message.id, redis_reaction.format(method="search", id=search_id))
+                self._redis.set(search_id, pickle.dumps(cache_dto))
 
-            search_maps = filter_and_sort_beatmap_sets(artist, title, search_maps)
+                # 生成消息对象
+                search_result_message: Message = construct_message_obj(bot, message.id, message.ctx.channel.id,
+                                                                       message.ctx.guild.id, bot_id)
 
-            # 每页谱面数
-            step = 5
-            pages = [search_maps[i:i + step] for i in range(0, len(search_maps), step)]
+                # 根据映射中的key添加回应
+                for emoji in index_beatmap.keys():
+                    await search_result_message.add_reaction(emoji)
 
-            # 上传资源并生成搜索卡片
-            card, emojis = await upload_assets_and_generate_search_card(self._bot, self._guild, source, pages[0],
-                                                                        keyword, 0, len(pages))
+                # 如果存在下一页添加下一页的按钮
+                if has_next:
+                    await search_result_message.add_reaction('arrow_right')
 
-            # 卡片索引与对应谱面集id的映射
-            index_beatmap = {}
-            for i in range(len(pages[0])):
-                index_beatmap[index_emojis[i]] = pages[0][i].id
-
-            # 是否有下一页
-            has_next = True if len(pages) > 1 else False
-            cache_dto = SearchListCacheDTO(keyword, source, pages, index_beatmap, 0, message.ctx.guild.id)
-
-            # 更新等待卡片为搜索结果
-            await message.update(card)
-            # 将搜索结果缓存到redis
-            self._redis.set(message.id, redis_reaction.format(method="search", id=search_id))
-            self._redis.set(search_id, pickle.dumps(cache_dto))
-
-            # 生成消息对象
-            search_result_message: Message = construct_message_obj(bot, message.id, message.ctx.channel.id,
-                                                                   message.ctx.guild.id, bot_id)
-
-            # 根据映射中的key添加回应
-            for emoji in index_beatmap.keys():
-                await search_result_message.add_reaction(emoji)
-
-            # 如果存在下一页添加下一页的按钮
-            if has_next:
-                await search_result_message.add_reaction('arrow_right')
-
-            # 删除表情
-            if emojis:
-                tasks = [asyncio.create_task(self._guild.delete_emoji(emoji)) for emoji in emojis]
-                await asyncio.wait(tasks)
+                # 删除表情
+                if emojis:
+                    tasks = [asyncio.create_task(self._guild.delete_emoji(emoji)) for emoji in emojis]
+                    await asyncio.wait(tasks)
+            except:
+                card = await user_not_found_card(self._bot, '搜索失败')
+                await message.update(card)
 
         self._is_running = False
 
