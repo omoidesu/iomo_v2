@@ -47,7 +47,6 @@ async def info_parser(bot: Bot, msg: Message, *args):
         if mode == '':
             mode = user.default_mode
 
-    day = 1 if day == 0 else day
     # 调用osu api并生成卡片
     return await info_command(bot, str(osu_name), mode, int(day), user_id)
 
