@@ -36,19 +36,14 @@ def beatmap_set_card(beatmap_set: dict, beatmap_id: int, **kwargs):
 
     info = Module.Context(Element.Image(kwargs.get('avatar')))
     info.append(Element.Text(
-        f' [{user.get("username")}](https://osu.ppy.sh/users/{user.get("id")}) | {artist} - {title} | set id: {beatmap_set.get("id")} |'))
+        f' [{user.get("username")}](https://osu.ppy.sh/users/{user.get("id")}) | {artist} - {title} | set id: {beatmap_set.get("id")}'))
     struct_content = [
-        Element.Text(
-            f'**(font)流派: (font)[secondary]**(font){beatmap_set.get("genre", {}).get("name")}(font)[secondary]'),
-        Element.Text(
-            f'**(font)语言: (font)[secondary]**(font){beatmap_set.get("language", {}).get("name")}(font)[secondary]'),
-        Element.Text(
-            f'{Assets.Sticker.FAVOURITE} **(font)收藏数: (font)[secondary]**(font){beatmap_set.get("favourite_count")}(font)[secondary]'),
-        Element.Text(
-            f'{Assets.Sticker.PLAYCOUNT} **(font)游玩数: (font)[secondary]**(font){beatmap_set.get("play_count")}(font)[secondary]')
+        Element.Text(f'(font){beatmap_set.get("genre", {}).get("name")}(font)[secondary]'),
+        Element.Text(f'(font){beatmap_set.get("language", {}).get("name")}(font)[secondary]'),
+        Element.Text(f'{Assets.Sticker.FAVOURITE}(font) {beatmap_set.get("favourite_count")}(font)[secondary]')
     ]
 
-    genre = Module.Section(Struct.Paragraph(2, *struct_content))
+    genre = Module.Section(Struct.Paragraph(3, *struct_content))
 
     tags = Module.Context(Element.Text(f'**(font)tags: (font)[secondary]***{beatmap_set.get("tags")}*'))
 
