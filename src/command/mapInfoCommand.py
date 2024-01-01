@@ -5,7 +5,7 @@ from khl import Bot
 from src.card import beatmap_card, beatmap_set_card
 from src.const import Assets
 from src.service import OsuApi
-from src.util.uploadAsset import generate_stars, upload_asset
+from src.util.uploadAsset import generate_stars, upload_asset, download_audio_and_upload
 
 
 async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = None):
@@ -27,9 +27,13 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = No
         diff = beatmap.get('difficulty_rating')
         tasks.append(generate_stars(bot, mode, diff, kwargs, f'{mode}{diff}'))
 
-    preview = beatmapset.get('preview_url')
-    if preview:
-        tasks.append(upload_asset(bot, 'https:' + preview, kwargs, 'preview', Assets.Audio.WELCOME))
+    audio_url = await download_audio_and_upload(bot, beatmapset_id)
+    if audio_url:
+        kwargs['preview'] = audio_url
+    else:
+        preview = beatmapset.get('preview_url')
+        if preview:
+            tasks.append(upload_asset(bot, 'https:' + preview, kwargs, 'preview', Assets.Audio.WELCOME))
 
     avatar = beatmapset.get('user', {}).get('avatar_url')
     if avatar:

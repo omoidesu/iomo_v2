@@ -291,7 +291,7 @@ class SayoApi:
         url = f'{sayo_api}/v2/beatmapinfo'
         params = {
             'K': keyword,
-            'T': 1 if id_mode else 0,
+            'type': 1 if id_mode else 0,
         }
 
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
@@ -309,7 +309,7 @@ class SayoApi:
             'referer': 'https://osu.sayobot.cn/home'
         }
         async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
-            async with session.get(url) as resp:
+            async with session.get(url, headers=headers) as resp:
                 if resp.status != 200:
                     raise NetException(f'下载失败 code: {resp.status}')
 
