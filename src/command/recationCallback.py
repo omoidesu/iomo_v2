@@ -6,7 +6,7 @@ from src.card import score_card
 from src.const import Assets, redis_recent_beatmap
 from src.dao.models import OsuBeatmapSet
 from src.dto import RecentListCacheDTO
-from src.service import OsuApi, beatmap_set_service, simulate_pp_if_fc, simulate_pp_with_accuracy
+from src.service import IomoApi, OsuApi, beatmap_set_service, simulate_pp_if_fc, simulate_pp_with_accuracy
 from src.util.uploadAsset import generate_stars, upload_asset
 
 
@@ -79,6 +79,7 @@ async def reaction_callback(bot: Bot, redis_connector, channel_id: int, score_id
 
     redis_key = redis_recent_beatmap.format(guild_id=dto.guild_id, channel_id=channel_id)
     redis_connector.set(redis_key, score.get('beatmap', {}).get('id'))
+    tasks.append(IomoApi.download_map(str(beatmap_set.get('id'))))
 
     await asyncio.wait(tasks)
     return score_card(score, beatmap, beatmap_set, **kwargs)

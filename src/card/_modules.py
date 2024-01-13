@@ -30,9 +30,10 @@ class Modules:
             ppy = f'[osu!](https://osu.ppy.sh/beatmapsets/{beatmapset_id})'
         sayo = f'[sayobot](https://dl.sayobot.cn/beatmaps/download/novideo/{beatmapset_id})'
         chimu = f'[chimu](https://api.chimu.moe/v1/download/{beatmapset_id}?n=1)'
+        iomo = f'[iomo](https://kook.omoi.club/iomo/{beatmapset_id}.osz)'
         btct = f'[btct](https://beatconnect.io/b/{beatmapset_id})'
 
-        text = f'下载地址：{ppy} | {sayo} | {chimu} | {btct}'
+        text = f'下载地址：{ppy} | {sayo} | {chimu} | {iomo} | {btct}'
 
         return Module.Context(text)
 
@@ -153,7 +154,7 @@ class Modules:
             Element.Text(f'**Score** {format(score_info.get("score"), ",")}', type=Types.Text.KMD),
             Element.Text(f'{score_info.get("max_combo")} x {f"/ **{fc_combo} x**" if fc_combo else ""}',
                          type=Types.Text.KMD),
-            Element.Text(f'{("+" + "".join(score_info.get("mods", []))) if score_info.get("mods", []) else ""}',
+            Element.Text(f'{("+" + "".join(score_info.get("mods", []))) if score_info.get("mods", []) else " "}',
                          type=Types.Text.KMD)
         ]
 

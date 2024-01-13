@@ -7,7 +7,7 @@ from src.const import Assets, redis_recent_beatmap
 from src.dao import Redis
 from src.dao.models import OsuBeatmapSet
 from src.exception import OsuApiException
-from src.service import OsuApi, beatmap_set_service, simulate_pp_if_fc, simulate_pp_with_accuracy
+from src.service import IomoApi, OsuApi, beatmap_set_service, simulate_pp_if_fc, simulate_pp_with_accuracy
 from src.util import filter_and_sort_beatmap_sets, search_beatmap_sets
 from src.util.uploadAsset import generate_stars, upload_asset, user_not_found_card
 
@@ -160,6 +160,7 @@ async def upload_assets_and_generate_card(bot: Bot, msg: Message, score: dict, b
 
     redis_key = redis_recent_beatmap.format(guild_id=msg.ctx.guild.id, channel_id=msg.ctx.channel.id)
     redis.set(redis_key, beatmap.get('id'))
+    tasks.append(IomoApi.download_map(str(beatmap_set.get('id'))))
 
     await asyncio.wait(tasks)
     return score_card(score, beatmap, beatmap_set, **kwargs)

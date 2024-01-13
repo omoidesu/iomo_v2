@@ -4,8 +4,8 @@ from khl import Bot
 
 from src.card import beatmap_card, beatmap_set_card
 from src.const import Assets
-from src.service import OsuApi
-from src.util.uploadAsset import generate_stars, upload_asset, download_audio_and_upload
+from src.service import IomoApi, OsuApi
+from src.util.uploadAsset import download_audio_and_upload, generate_stars, upload_asset
 
 
 async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = None):
@@ -27,7 +27,7 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = No
         diff = beatmap.get('difficulty_rating')
         tasks.append(generate_stars(bot, mode, diff, kwargs, f'{mode}{diff}'))
 
-    audio_url = await download_audio_and_upload(bot, beatmapset_id)
+    audio_url = await download_audio_and_upload(beatmapset_id)
     if audio_url:
         kwargs['preview'] = audio_url
     else:
@@ -41,6 +41,8 @@ async def beatmap_set_command(bot: Bot, beatmapset_id: int, beatmap_id: int = No
     else:
         kwargs['avatar'] = Assets.Image.DEFAULT_AVATAR
 
+    tasks.append(IomoApi.download_map(str(beatmapset_id)))
+
     await asyncio.wait(tasks)
     return beatmap_set_card(beatmapset, beatmap_id, **kwargs)
 
@@ -51,7 +53,9 @@ async def beatmap_command(bot: Bot, beatmap_id: int):
     tasks = []
 
     beatmap = await api.get_beatmap_info(beatmap_id)
-    cover = beatmap.get('beatmapset', {}).get('covers', {}).get('list')
+    beatmapset = beatmap.get('beatmapset')
+    set_id = beatmapset.get('id')
+    cover = beatmapset.get('covers', {}).get('list')
     if cover:
         tasks.append(asyncio.create_task(upload_asset(bot, cover, kwargs, 'cover', Assets.Image.DEFAULT_COVER)))
     else:
@@ -60,5 +64,7 @@ async def beatmap_command(bot: Bot, beatmap_id: int):
     tasks.append(
         asyncio.create_task(generate_stars(bot, beatmap.get('mode'), beatmap.get('difficulty_rating'), kwargs, 'diff')))
 
+    tasks.append(IomoApi.download_map(str(set_id)))
+
     await asyncio.wait(tasks)
-    return beatmap_card(beatmap, **kwargs), beatmap.get('beatmapset', {}).get('id'), beatmap.get('id')
+    return beatmap_card(beatmap, **kwargs), set_id, beatmap.get('id')

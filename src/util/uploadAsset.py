@@ -1,8 +1,6 @@
 import io
 import math
 import os
-import shutil
-import zipfile
 
 import aiofiles
 import aiohttp
@@ -16,7 +14,7 @@ from src.card import user_not_found_card as card
 from src.const import Assets
 from src.dao.models import OsuAsset, OsuStarAsset
 from src.exception import NetException
-from src.service import SayoApi, asset_service, star_asset_service
+from src.service import IomoApi, SayoApi, asset_service, star_asset_service
 
 
 async def download_and_upload(bot: Bot, resource: str, force: bool = False, origin: bool = False):
@@ -155,7 +153,7 @@ async def generate_stars(bot: Bot, mode: str, stars: float, to: dict, key: str, 
     to[key] = await generate_diff_png_and_upload(bot, mode, stars, emoji, guild)
 
 
-async def download_audio_and_upload(bot: Bot, beatmap_set: int):
+async def download_audio_and_upload(beatmap_set: int):
     """
     从sayobot下载谱面并将音频上传kook
     :param bot:
@@ -167,25 +165,14 @@ async def download_audio_and_upload(bot: Bot, beatmap_set: int):
     if asset is not None:
         return asset.oss_url
 
-    beatmap_info = await SayoApi.get_beatmap_info(beatmap_set, id_mode=True)
+    beatmap_info = await SayoApi.get_beatmap_info(str(beatmap_set), id_mode=True)
     bid_data = beatmap_info.get('data', {}).get('bid_data', [])
     if not bid_data:
         return None
 
     audio_file = bid_data[0].get('audio')
-    unzip_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'download', f'{beatmap_set}')
-    audio_path = os.path.join(unzip_path, audio_file)
-
-    if not os.path.exists(audio_path):
-        content = await SayoApi.download_beatmaps(beatmap_set)
-        with zipfile.ZipFile(io.BytesIO(content), 'r') as f:
-            f.extractall(unzip_path)
-
-    async with aiofiles.open(audio_path, 'rb') as f:
-        kook_url = await bot.client.create_asset(io.BytesIO(await f.read()))
-        asset = OsuAsset(source_url=resource_uri, oss_url=kook_url)
-        asset_service.insert(asset)
-
-    shutil.rmtree(unzip_path)
-
-    return kook_url
+    try:
+        resp: dict = await IomoApi.get_music_url(str(beatmap_set), audio_file)
+        return resp.get('message') if resp.get('code') == 200 else None
+    except:
+        return None

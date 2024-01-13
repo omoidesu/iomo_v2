@@ -1,10 +1,9 @@
 import json
 
 import aiohttp
-import requests
 from aiohttp import TCPConnector
 
-from src.config import client_id, client_secret
+from src.config import client_id, client_secret, iomo_url
 from src.const import osu_api, redis_access_token, redis_refresh_token, sayo_api
 from src.dao import Redis
 from src.exception import ArgsException, NetException, OsuApiException
@@ -316,5 +315,48 @@ class SayoApi:
                 return await resp.content.read()
 
 
-class Chimu:
-    ...
+class IomoApi:
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    @staticmethod
+    async def get_music_url(beatmapset_id: str, file_name: str):
+        """获取音乐地址"""
+        url = iomo_url + 'music'
+
+        params = {
+            'setId': beatmapset_id,
+            'musicFile': file_name
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=IomoApi.headers, data=json.dumps(params)) as resp:
+                return await resp.json()
+
+    @staticmethod
+    async def download_map(beatmapset_id: str):
+        """下载谱面"""
+        url = iomo_url + 'map'
+
+        params = {
+            'setId': beatmapset_id
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=IomoApi.headers, data=json.dumps(params)) as resp:
+                return await resp.json()
+
+    @staticmethod
+    async def get_bp_pack(osu_name: str, set_ids: list[str]):
+        """获取bp list"""
+        url = iomo_url + 'bp'
+
+        params = {
+            'osuName': osu_name,
+            'setIdList': set_ids
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=IomoApi.headers, data=json.dumps(params)) as resp:
+                return await resp.json()

@@ -142,7 +142,7 @@ async def mp(msg: Message, *args):
 
 @bot.command(name='copy', aliases=['cp'], prefixes=['.', '/'])
 async def copy(msg: Message, *args):
-    waiting = await msg.reply(waiting_card('下载中，请稍候'))
+    waiting = await msg.reply('下载中，请稍候')
     reply, waiting_msg = await copy_parser(bot, msg, waiting.get('msg_id'), me.id, *args)
     await waiting_msg.update(reply)
 

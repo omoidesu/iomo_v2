@@ -1,17 +1,13 @@
 import asyncio
-import os
-import zipfile
 from datetime import datetime
-from io import BytesIO
 
 import aiofiles
 from khl import Bot
 
 from src.card import bp_card, no_bp_card
-from src.config import minio_bucket, minio_endpoint_cdn
 from src.const import Assets
 from src.exception import OsuApiException
-from src.service import MinioClient, OsuApi, SayoApi
+from src.service import IomoApi, OsuApi, SayoApi
 from src.util.uploadAsset import good_news_generator, upload_asset, user_not_found_card
 
 
@@ -126,45 +122,24 @@ async def copy_bps(bot: Bot, osu_name: str, mode: str, mods: list):
         if len(bp_info) == 0:
             return f'该用户没有mod为{"".join(mods)}的bp记录'
 
-    bp_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'bp')
-    bp_download_path = os.path.join(bp_dir, str(osu_name))
-    if not os.path.exists(bp_download_path):
-        os.mkdir(bp_download_path)
-    else:
-        for file in os.listdir(bp_download_path):
-            os.remove(os.path.join(bp_download_path, file))
-
-    tasks = [asyncio.create_task(__download_beatmap(set_id, os.path.join(bp_download_path, f'{set_id}.osz'))) for set_id
-             in {bp.get('beatmapset').get('id') for bp in bp_info[:50]}]
-    await asyncio.wait(tasks)
-
-    stream = BytesIO()
-
-    with zipfile.ZipFile(stream, 'w') as f:
-        for file in os.listdir(bp_download_path):
-            f.write(os.path.join(bp_download_path, file), file)
-            os.remove(os.path.join(bp_download_path, file))
-
-    client = MinioClient.instance()
-    filename = f'{osu_name}-{datetime.now().timestamp()}.zip'
-    await client.put_object(minio_bucket, filename, BytesIO(stream.getvalue()), stream.getbuffer().nbytes,
-                            content_type='application/zip', progress=True)
-
-    url = f'[下载地址](http://{minio_endpoint_cdn}/{minio_bucket}/{filename})'
-
-    return url
+    resp: dict = await IomoApi.get_bp_pack(osu_id,
+                                           list(map(lambda x: str(x.get('beatmapset').get('id')), bp_info[:50])))
+    return f'[下载地址]({resp.get("message")})'
 
 
 async def __bp_traverse(bot: Bot, bp_list: list, to: dict, api: OsuApi):
     tasks = []
     for bp in bp_list:
-        cover = bp.get('beatmapset').get('covers', {}).get('list')
+        beatmap_set = bp.get('beatmapset')
+        set_id = beatmap_set.get('id')
+        cover = beatmap_set.get('covers', {}).get('list')
         if cover:
             tasks.append(
                 asyncio.create_task(upload_asset(bot, cover, to, f"cover{bp.get('id')}", Assets.Image.DEFAULT_COVER)))
         else:
             to[f"cover{bp.get('id')}"] = Assets.Image.OSU_LOGO
         tasks.append(asyncio.create_task(__get_max_combo(api, bp.get('beatmap').get('id'), to, f"combo{bp.get('id')}")))
+        tasks.append(asyncio.create_task(IomoApi.download_map(set_id)))
 
     await asyncio.wait(tasks)
 
