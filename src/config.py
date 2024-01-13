@@ -13,12 +13,20 @@ redis_pass = 'omoi'
 redis_db = 0
 redis_subscribe = f'__keyevent@{redis_db}__:expired'
 
+# iomo url
+iomo_url = ''
+
 # kook bot token
 bot_token = ''
+
+# osu oauth
+oauth_url = ''
 
 # osu api token
 client_id = 0
 client_secret = ''
+
+osu_tools_path = r''
 
 # admin
 admin_id = ('',)
@@ -30,8 +38,8 @@ playing_game_id = 5883  # osu!
 emoji_guild = ''
 
 # channel for user's osu homepage url, when catch osu homepage url will register automatically
-user_channel = ('', '',)
+user_channel = ('')
 
 # osu guild
-osu_guild = '5107224330983339'
-osu_guild_role = {'osu': 197862, 'taiko': 197869, 'fruits': 197870, 'mania': 197865}
+osu_guild = ''
+osu_guild_role = {'osu': 0, 'taiko': 0, 'fruits': 0, 'mania': 0}
