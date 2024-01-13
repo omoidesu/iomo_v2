@@ -122,8 +122,10 @@ async def bp(msg: Message, *args):
 
 @bot.command(name='bptoday', aliases=['bpme', 't', 'today'], prefixes=['.', '/'])
 async def bptoday(msg: Message, *args):
-    reply = await bp_today_parser(bot, msg, *args)
-    await msg.reply(reply)
+    cards = await bp_today_parser(bot, msg, *args)
+    await msg.reply(cards[0])
+    for card in cards[1:]:
+        await msg.ctx.channel.send(card)
 
 
 @bot.command(name='rank', prefixes=['.', '/'])

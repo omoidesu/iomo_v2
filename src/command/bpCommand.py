@@ -97,7 +97,7 @@ async def bp_today_command(bot: Bot, osu_name: str, mode: str):
 
         await __bp_traverse(bot, today_bps, kwargs, api)
 
-        return bp_card(today_bps, **kwargs)
+        return [bp_card(bp_list, **kwargs) for bp_list in [today_bps[i: i + 10] for i in range(0, len(today_bps), 10)]]
 
 
 async def copy_bps(bot: Bot, osu_name: str, mode: str, mods: list):
